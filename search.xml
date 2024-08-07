@@ -4,6 +4,35 @@
   
     
     <entry>
+      <title>Syetem()与Execve()的区别</title>
+      <link href="/posts/fd137f81/"/>
+      <url>/posts/fd137f81/</url>
+      
+        <content type="html"><![CDATA[<p><code>execve</code> 和 <code>system</code> 是两个常用的系统调用或库函数，用于在 Unix-like 操作系统中执行其他程序。它们有不同的用途和行为，下面详细解释它们的区别。</p><h3 id="execve-函数"><a href="#execve-函数" class="headerlink" title="execve 函数"></a><code>execve</code> 函数</h3><p><code>execve</code> 是一个系统调用，用于在当前进程空间中执行一个新的程序。其原型如下：</p><figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">execve</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *pathname, <span class="type">char</span> *<span class="type">const</span> argv[], <span class="type">char</span> *<span class="type">const</span> envp[])</span>;</span><br></pre></td></tr></table></figure><h4 id="参数"><a href="#参数" class="headerlink" title="参数"></a>参数</h4><ul><li><code>pathname</code>：要执行的程序的路径。</li><li><code>argv</code>：传递给新程序的参数数组。数组的第一个元素通常是程序名称，最后一个元素必须是NULL。</li><li><code>envp</code>：传递给新程序的环境变量数组，最后一个元素也必须是NULL。</li></ul><h4 id="特点"><a href="#特点" class="headerlink" title="特点"></a>特点</h4><ol><li><strong>直接替换当前进程</strong>：<code>execve</code> 调用成功后，当前进程的代码、数据和堆栈都被替换为新程序的内容，当前进程PID保持不变。</li><li><strong>没有返回</strong>：如果 <code>execve</code> 调用成功，当前进程不会返回到调用点。只有在调用失败时才会返回，并设置适当的错误码。</li><li><strong>更灵活</strong>：可以指定新程序的执行路径、参数和环境变量。</li></ol><h4 id="使用示例"><a href="#使用示例" class="headerlink" title="使用示例"></a>使用示例</h4><figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">char</span> *args[] = &#123; <span class="string">&quot;/bin/ls&quot;</span>, <span class="string">&quot;-l&quot;</span>, <span class="literal">NULL</span> &#125;;</span><br><span class="line"><span class="type">char</span> *env[] = &#123; <span class="literal">NULL</span> &#125;;</span><br><span class="line">execve(<span class="string">&quot;/bin/ls&quot;</span>, args, env);</span><br></pre></td></tr></table></figure><h3 id="system-函数"><a href="#system-函数" class="headerlink" title="system 函数"></a><code>system</code> 函数</h3><p><code>system</code> 是标准C库中的一个函数，用于通过调用 <code>/bin/sh</code> 来执行一个命令字符串。其原型如下：</p><figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">system</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *command)</span>;</span><br></pre></td></tr></table></figure><h4 id="参数-1"><a href="#参数-1" class="headerlink" title="参数"></a>参数</h4><ul><li><code>command</code>：要执行的命令字符串。</li></ul><h4 id="特点-1"><a href="#特点-1" class="headerlink" title="特点"></a>特点</h4><ol><li><strong>创建子进程</strong>：<code>system</code> 创建一个子进程来执行给定的命令字符串，父进程等待子进程执行完毕。</li><li><strong>依赖 shell</strong>：<code>system</code> 使用 <code>/bin/sh -c</code> 来执行命令，因此命令字符串可以包含任何 shell 支持的语法和命令。</li><li><strong>简单方便</strong>：适合执行简单的命令，但不如 <code>execve</code> 灵活。</li></ol><h4 id="返回值"><a href="#返回值" class="headerlink" title="返回值"></a>返回值</h4><ul><li>返回命令执行的状态码。如果命令执行失败或 <code>system</code> 调用失败，则返回非零值。</li></ul><h4 id="使用示例-1"><a href="#使用示例-1" class="headerlink" title="使用示例"></a>使用示例</h4><figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">int</span> status = system(<span class="string">&quot;ls -l&quot;</span>);</span><br></pre></td></tr></table></figure><h3 id="区别总结"><a href="#区别总结" class="headerlink" title="区别总结"></a>区别总结</h3><ol><li><p><strong>执行环境</strong>：</p><ul><li><code>execve</code>：替换当前进程的执行环境。</li><li><code>system</code>：在子进程中执行命令，父进程等待子进程完成。</li></ul></li><li><p><strong>灵活性</strong>：</p><ul><li><code>execve</code>：更灵活，可以直接指定程序路径、参数和环境变量。</li><li><code>system</code>：依赖 shell，适合执行简单的命令字符串。</li></ul></li><li><p><strong>依赖性</strong>：</p><ul><li><code>execve</code>：不依赖 shell。</li><li><code>system</code>：依赖 <code>/bin/sh</code>。</li></ul></li><li><p><strong>返回值和控制流</strong>：</p><ul><li><code>execve</code>：成功执行后不会返回；失败时返回错误码。</li><li><code>system</code>：返回子进程的状态码或错误码。</li></ul></li></ol><h3 id="适用场景"><a href="#适用场景" class="headerlink" title="适用场景"></a>适用场景</h3><ul><li>使用 <code>execve</code>：当需要精确控制新程序的执行环境时，如传递特定的参数和环境变量。</li><li>使用 <code>system</code>：当只需要执行一个简单的命令字符串，并不需要精细控制命令的执行环境时。</li></ul><h3 id="安全性"><a href="#安全性" class="headerlink" title="安全性"></a>安全性</h3><ul><li><code>system</code>：由于依赖 shell，存在命令注入风险，特别是在处理用户输入时需要格外小心。</li><li><code>execve</code>：不依赖 shell，因此更安全，但需要更复杂的调用参数。</li></ul><p>通过这些区别和特点，开发者可以根据具体需求选择合适的函数来执行外部程序。</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 安全 </category>
+          
+          <category> CTF </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> CTF </tag>
+            
+            <tag> PWN </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>Hello World</title>
       <link href="/posts/undefined/"/>
       <url>/posts/undefined/</url>
