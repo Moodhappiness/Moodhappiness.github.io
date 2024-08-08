@@ -1,4 +1,9 @@
-#web_bg {
+.loading-img {
+  background: url(https://gitee.com/mazishu/images/raw/master/epoch.jpg) no-repeat center center;
+  background-size: cover;
+}
+
+/* #web_bg {
   background: -webkit-linear-gradient(
     0deg,
     rgba(247, 149, 51, 0.1) 0,
@@ -54,4 +59,4 @@
     rgba(7, 179, 155, 0.1) 86%,
     rgba(109, 186, 130, 0.1) 100%
   );
-}
+} */
