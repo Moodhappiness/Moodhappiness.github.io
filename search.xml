@@ -4,6 +4,33 @@
   
     
     <entry>
+      <title>Vulnhub-DC1</title>
+      <link href="/posts/3bdfdcb0/"/>
+      <url>/posts/3bdfdcb0/</url>
+      
+        <content type="html"><![CDATA[<h2 id="DC-1"><a href="#DC-1" class="headerlink" title="DC-1"></a>DC-1</h2><h3 id="信息搜集"><a href="#信息搜集" class="headerlink" title="信息搜集"></a>信息搜集</h3><p>首先将虚拟靶机的网络设置为net模式</p><p>首先<code>arp-scan-l</code>扫描存活主机</p><p><img src="https://pic.imgdb.cn/item/66e23295d9c307b7e90b4ea0.png"></p><p>浏览器页面访问主机</p><p><img src="https://pic.imgdb.cn/item/66e232ced9c307b7e90b7d95.png"></p><p>nmap扫描开放的端口</p><p><img src="https://pic.imgdb.cn/item/66e2330ad9c307b7e90ba02b.png"></p><p>继续扫描端口的版本信息</p><p><img src="https://pic.imgdb.cn/item/66e23351d9c307b7e90bcfe5.png"></p><p>分析页面信息<code>whatweb 192.168.154.137</code></p><p><img src="https://pic.imgdb.cn/item/66e2339ad9c307b7e90c0138.png"></p><p>发现网页的CMS框架是Drupal7，搜索Drupal7存在的漏洞</p><p><img src="https://pic.imgdb.cn/item/66e234fed9c307b7e90d1091.png"></p><p>那么直接进入msf  <code>msfconsole</code></p><p><code>search drupal</code></p><p><img src="https://pic.imgdb.cn/item/66e2364bd9c307b7e90e017f.png"></p><p>使用第二个</p><p>使用<code>set rhosts</code>设置目标靶机的ip</p><p><img src="https://pic.imgdb.cn/item/66e236ced9c307b7e90e6504.png"></p><p>run 运行后ls查看网站目录结构</p><p><img src="https://pic.imgdb.cn/item/66e23751d9c307b7e90ec6ea.png"></p><p>发现flag1.txt尝试cat 发现提示信息</p><p><img src="https://pic.imgdb.cn/item/66e25865d9c307b7e93bd95c.png"></p><p>提示在配置文件中</p><p>输入shell后用python写一段交互式脚本</p><figure class="highlight python"><table><tr><td class="code"><pre><span class="line">python -c <span class="string">&quot;import pty;pty.spawn(&#x27;/bin/bash&#x27;);&quot;</span></span><br></pre></td></tr></table></figure><p><img src="https://pic.imgdb.cn/item/66e25a2ed9c307b7e94097ce.png"></p><p>查找配置文件的路径 </p><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">sites/default/settings.php</span><br></pre></td></tr></table></figure><p><img src="https://pic.imgdb.cn/item/66e25b12d9c307b7e943f5d8.png"></p><p>进入后cat settings.py查看内容</p><p>发现是一段php代码，并且有flag2的提示信息</p><p><img src="https://pic.imgdb.cn/item/66e25b6ad9c307b7e9452cd2.png"></p><p>并且给出了mysql的用户名与密码</p><p><img src="https://pic.imgdb.cn/item/66e25b9cd9c307b7e9462c85.png"></p><p>数据库连接</p><p><img src="https://pic.imgdb.cn/item/66e25c27d9c307b7e946e62b.png"></p><p>查看数据库</p><p><img src="C:%5CUsers%5CDELL%5CAppData%5CRoaming%5CTypora%5Ctypora-user-images%5Cimage-20240912111449580.png" alt="image-20240912111449580"></p><p>查看drupaldb数据库中的表</p><p><img src="https://pic.imgdb.cn/item/66e25cdfd9c307b7e947a52a.png"></p><p>存在users表，查看users表的结构</p><p><img src="https://pic.imgdb.cn/item/66e25d7fd9c307b7e948508a.png"></p><p>查看name,pass的内容</p><p><img src="https://pic.imgdb.cn/item/66e25ddad9c307b7e948aa2d.png"></p><p>发现admin</p><p>密码的加密方式是自定义的，查找存在password字样的文件</p><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">find . -name *password*</span><br></pre></td></tr></table></figure><p><img src="https://pic.imgdb.cn/item/66e25e68d9c307b7e949423b.png"></p><p>发现password-hash.sh文件，查看文件内容</p><p><img src="https://pic.imgdb.cn/item/66e2e4dbd9c307b7e91ae88e.png"></p><p>是一段php代码</p><p>那么我们可以利用这个文件，将上面我们发现的admin账户的密码改成我们想要的值(e.g. 123456)</p><p><img src="https://pic.imgdb.cn/item/66e2e5c6d9c307b7e91c43a7.png"></p><p>那么便可以将得到的值替换数据库中存储的密码值</p><p>先连接数据库后  <code>mysql -udbuser -pR0ck3t</code></p><p>进入到drupaldb库中 <code>use drupaldb</code></p><p>然后使用update语句更新存储的值 </p><p><img src="https://pic.imgdb.cn/item/66e2e6ecd9c307b7e920f009.png"></p><p>更新完成后使用我们自定义的值在页面登录</p><p><img src="https://pic.imgdb.cn/item/66e2e73ad9c307b7e92219c3.png"></p><p>登录成功后在dashboard中看到了flag3的字样</p><p>点击查看 发现提示信息</p><p>意思为：特殊的PERMS将有助于找到passwd-但您需要执行该命令以确定如何获取shadow中的内容。</p><p>查看&#x2F;etc&#x2F;passwd</p><p><img src="https://pic.imgdb.cn/item/66e2e85bd9c307b7e926cbf6.png"></p><p>最后一行发现flag4,并且flag4是普通用户</p><p>读取其内容</p><p><img src="https://pic.imgdb.cn/item/66e2e8d2d9c307b7e9276a4c.png"></p><p>提示获取flag4需要root权限</p><p>结合flag3的提示Special PERMS（特殊权限）指带有权限的特殊文件，可以想到使用suid提权</p><p>首先使用命令查找 这些具有特殊权限的文件</p><p><code>find / -perm /4000 2&gt;/dev/null</code></p><p><img src="https://pic.imgdb.cn/item/66e2ea32d9c307b7e9293ca6.png"></p><p>可以使用find命令提权</p><p>首先可以查看find命令的权限</p><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="built_in">touch</span> 666</span><br><span class="line"><span class="built_in">ls</span></span><br><span class="line">find -name 666 -<span class="built_in">exec</span> <span class="string">&quot;whoami&quot;</span> \;</span><br></pre></td></tr></table></figure><p><img src="https://pic.imgdb.cn/item/66e2eddfd9c307b7e92eb120.png"></p><p>提权 <code>/bin/bash</code> 或者 <code>/bin/sh</code></p><p>提权后访问&#x2F;root&#x2F; 拿到flag</p><p><img src="https://pic.imgdb.cn/item/66e2ee20d9c307b7e92f2543.png"></p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 安全 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 安全 </tag>
+            
+            <tag> 渗透 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>Vulnhub-DC9</title>
       <link href="/posts/35045482/"/>
       <url>/posts/35045482/</url>
