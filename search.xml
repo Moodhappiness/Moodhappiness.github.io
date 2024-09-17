@@ -4,6 +4,37 @@
   
     
     <entry>
+      <title>Vulnhub-Potato</title>
+      <link href="/posts/ee0929c4/"/>
+      <url>/posts/ee0929c4/</url>
+      
+        <content type="html"><![CDATA[<h2 id="Vulnhub–potato"><a href="#Vulnhub–potato" class="headerlink" title="Vulnhub–potato"></a>Vulnhub–potato</h2><p>靶机下载好后将网络配置修改为NAT模式</p><h3 id="信息收集"><a href="#信息收集" class="headerlink" title="信息收集"></a>信息收集</h3><p>首先kali中<code>arp-scan -l</code>扫描靶机的ip地址</p><p><img src="https://pic.imgdb.cn/item/66e908e3d9c307b7e99ed75f.png"></p><p>扫描到ip后nmap扫描开放的端口</p><p><img src="https://pic.imgdb.cn/item/66e90966d9c307b7e99f42d0.png"></p><p>-sS 使用半开放扫描</p><p>-sV 版本探测</p><p>-sC 使用默认脚本扫描</p><p>-p- 扫描所有端口，默认情况下只扫描常见的1000个端口，这个选项会扫描所有的65535个TCP端口</p><p>扫描到两个开放的端口。7120开放ssh协议</p><p>访问下靶机的网页页面</p><p><img src="https://pic.imgdb.cn/item/66e90a8ad9c307b7e9a0304d.png"></p><p>和靶机名字很符合，只是一个土豆</p><p>尝试爆破7120端口，使用potato作为用户名</p><p><img src="https://pic.imgdb.cn/item/66e90baed9c307b7e9a12e3d.png"></p><p><img src="https://pic.imgdb.cn/item/66e90b89d9c307b7e9a10c36.png"></p><p>成功拿到用户名和密码</p><p>ssh尝试远程登录</p><p><img src="https://pic.imgdb.cn/item/66e90bfdd9c307b7e9a170eb.png"></p><p>登录成功</p><p>在之前nmap扫描端口详细信息时知道了时ubuntu系统，查看一下具体的ubuntu版本信息</p><p><img src="https://pic.imgdb.cn/item/66e90c68d9c307b7e9a1d3ca.png"></p><p>在另一个终端查看ubuntu14的漏洞信息</p><p><img src="https://pic.imgdb.cn/item/66e90cc1d9c307b7e9a2340c.png"></p><p>linux&#x2F;local&#x2F;37292.c，常见的本地提权漏洞，非常适用于ubuntu14.04</p><h3 id="漏洞利用"><a href="#漏洞利用" class="headerlink" title="漏洞利用"></a>漏洞利用</h3><p>可以利用这个漏洞进行提权</p><p>首先将这个漏洞的代码移动到kali的主文件夹下</p><p><img src="https://pic.imgdb.cn/item/66e90e4ed9c307b7e9a41c11.png"></p><p>kali开启web服务</p><p><img src="https://pic.imgdb.cn/item/66e90e9cd9c307b7e9a47265.png"></p><p>ifconfig获得kali主机的ip地址</p><p><img src="https://pic.imgdb.cn/item/66e90ed3d9c307b7e9a4ba29.png"></p><p>使用wget从kali开启的http服务下下载37292.c</p><p><img src="https://pic.imgdb.cn/item/66e90f3bd9c307b7e9a54118.png"></p><p>使用gcc编译37292.c重命名为exp</p><p><img src="https://pic.imgdb.cn/item/66e90fdbd9c307b7e9a6049a.png"></p><h3 id="提权"><a href="#提权" class="headerlink" title="提权"></a>提权</h3><p>运行exp后提权成功</p><p><img src="https://pic.imgdb.cn/item/66e9100ed9c307b7e9a63cfb.png"></p><p>切换到root目录后拿到flag</p><p><img src="https://pic.imgdb.cn/item/66e91044d9c307b7e9a66b6f.png"></p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 安全 </category>
+          
+          <category> Vulnhub </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 安全 </tag>
+            
+            <tag> 渗透 </tag>
+            
+            <tag> 靶机 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>Vulnhub-DC1</title>
       <link href="/posts/3bdfdcb0/"/>
       <url>/posts/3bdfdcb0/</url>
