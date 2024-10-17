@@ -4,6 +4,39 @@
   
     
     <entry>
+      <title>BUUCTF-蜘蛛侠呀</title>
+      <link href="/posts/77028167/"/>
+      <url>/posts/77028167/</url>
+      
+        <content type="html"><![CDATA[<h1 id="BUUCTF-蜘蛛侠呀"><a href="#BUUCTF-蜘蛛侠呀" class="headerlink" title="BUUCTF-蜘蛛侠呀"></a>BUUCTF-蜘蛛侠呀</h1><p>eeemmmmmmmmmmmm…很抽象的一个题 一环套一环的</p><p>附件拿到手后是一个流量包 有很多的ICMP包</p><p><img src="https://pic.imgdb.cn/item/670fbc0dd29ded1a8c4a701c.png"></p><p><img src="https://pic.imgdb.cn/item/670fbc2dd29ded1a8c4a8bd5.png"></p><p>发现ICMP包后面都跟着一段data每一个重复4次</p><p>将data数据全部提取出来</p><p><strong><code>tshark -r out.pcap -T fields -e data &gt; data.txt</code></strong></p><p>拿到的数据有重复行 去除重复行</p><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">with</span> <span class="built_in">open</span>(<span class="string">&#x27;data1.txt&#x27;</span> ,<span class="string">&#x27;r&#x27;</span>) <span class="keyword">as</span> f:</span><br><span class="line">    res_list = []</span><br><span class="line">    lines = f.readlines()</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> lines:</span><br><span class="line">        <span class="keyword">if</span> i <span class="keyword">not</span> <span class="keyword">in</span> res_list:</span><br><span class="line">            res_list.append(i)</span><br><span class="line"><span class="keyword">with</span> <span class="built_in">open</span>(<span class="string">&#x27;data2.txt&#x27;</span>, <span class="string">&#x27;w&#x27;</span>) <span class="keyword">as</span> f:</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> res_list:</span><br><span class="line">        f.write(i)</span><br><span class="line"></span><br></pre></td></tr></table></figure><p>将得到的数据转为ascii</p><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> binascii</span><br><span class="line"><span class="keyword">with</span> <span class="built_in">open</span>(<span class="string">&#x27;data2.txt&#x27;</span>, <span class="string">&#x27;r&#x27;</span>) <span class="keyword">as</span> f:</span><br><span class="line">    <span class="keyword">with</span> <span class="built_in">open</span>(<span class="string">&#x27;data3.txt&#x27;</span>, <span class="string">&#x27;wb&#x27;</span>) <span class="keyword">as</span> f1:</span><br><span class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> f.readlines():</span><br><span class="line">            f1.write(binascii.unhexlify(i[:-<span class="number">1</span>]))</span><br></pre></td></tr></table></figure><p><img src="https://pic.imgdb.cn/item/670fbd51d29ded1a8c4b7312.png"></p><p>将拿到的数据去除第一行和最后一行以及每行最开始的$$START$$并去除换行符</p><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">with</span> <span class="built_in">open</span>(<span class="string">&#x27;data3.txt&#x27;</span>, <span class="string">&#x27;rb&#x27;</span>) <span class="keyword">as</span> f:</span><br><span class="line">    <span class="keyword">with</span> <span class="built_in">open</span>(<span class="string">&#x27;data4.txt&#x27;</span>, <span class="string">&#x27;wb&#x27;</span>) <span class="keyword">as</span> f1:</span><br><span class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> f.readlines():</span><br><span class="line">            <span class="keyword">if</span> i.startswith(<span class="string">b&#x27;$$START$$&#x27;</span>):</span><br><span class="line">                i = i.replace(<span class="string">b&#x27;$$START$$&#x27;</span>,<span class="string">b&#x27;&#x27;</span>, <span class="number">1</span>)</span><br><span class="line">            i = i.rstrip(<span class="string">b&#x27;\n&#x27;</span>)</span><br><span class="line">            f1.write(i)</span><br></pre></td></tr></table></figure><p>得到的数据拿到cyberchef中base64解密</p><p>下载解密出来的压缩包</p><p>发现是一张gif动图</p><p>逐帧查看没有发现flag</p><p>搜索后得知gif还可以时间隐写（原理就是每帧的时间长度不一样）</p><p><strong><code>identify -format &quot;%s %T \n&quot; flag.gif</code></strong></p><p><img src="https://pic.imgdb.cn/item/670fbe8ad29ded1a8c4c70d5.png"></p><p>使用命令解密后将20为0 50为1得到一串二进制数据</p><p><code>011011010100010000110101010111110011000101110100</code></p><p>转为十进制后再转为十六进制</p><p><img src="https://pic.imgdb.cn/item/670fbf2fd29ded1a8c4ceeb0.png"></p><p><img src="https://pic.imgdb.cn/item/670fbf5cd29ded1a8c4d11c6.png"></p><p>十六进制转为ascii后得到<code>md5_it</code></p><p><img src="https://pic.imgdb.cn/item/670fbf76d29ded1a8c4d2492.png"></p><p>md5加密后得到flag</p><p><img src="https://pic.imgdb.cn/item/670fbfc4d29ded1a8c4d5f36.png"></p><p>flag{37e733cce7fbe623a5cc3deee8176c78}</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> CTF </category>
+          
+          <category> MISC </category>
+          
+          <category> BUUCTF </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> CTF </tag>
+            
+            <tag> BUUCTF </tag>
+            
+            <tag> MISC </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>格式化字符串</title>
       <link href="/posts/7fabda03/"/>
       <url>/posts/7fabda03/</url>
