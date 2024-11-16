@@ -4,6 +4,35 @@
   
     
     <entry>
+      <title>湖南省赛2019-FindMe</title>
+      <link href="/posts/53535fb6/"/>
+      <url>/posts/53535fb6/</url>
+      
+        <content type="html"><![CDATA[<h2 id="湖南省赛2019-Findme"><a href="#湖南省赛2019-Findme" class="headerlink" title="[湖南省赛2019]Findme"></a>[湖南省赛2019]Findme</h2><p>这道题真的………..离谱抽象</p><p>拿到手后是5张图片</p><h2 id="1-png"><a href="#1-png" class="headerlink" title="1.png"></a>1.png</h2><p>将第一张图片放入到010中 crc报错 </p><p><img src="https://pic.imgdb.cn/item/6714fb59d29ded1a8cf63a9f.png"></p><p>github上有个项目叫做Deformed-Image-Restorer</p><p>可以快速修复crc报错</p><p><img src="https://pic.imgdb.cn/item/6714fbfad29ded1a8cf7dbbf.png"></p><p>得到这样一张图片</p><p><img src="https://pic.imgdb.cn/item/6714fc2cd29ded1a8cf85936.png"></p><p>拖入010中分析 切换视图为模板后发现有两个结构块缺少IDAT</p><p><img src="https://pic.imgdb.cn/item/6714fcdfd29ded1a8cfa259a.png"></p><p>IDAT为<code>49 44 41 54</code></p><p>补全缺失的IDAT后即可看到原图片</p><p><img src="https://pic.imgdb.cn/item/6714fd5dd29ded1a8cfb17a6.png"></p><p>放入Stegsolve中分析</p><p>在Blue Plane2中发现二维码 扫描得到一段文本</p><p><img src="https://pic.imgdb.cn/item/6714fde8d29ded1a8cfc49e4.png"></p><p><strong>ZmxhZ3s0X3</strong></p><h2 id="2-png"><a href="#2-png" class="headerlink" title="2.png"></a>2.png</h2><p>放入010分析后在下方会发现7z字样 将之后的信息全部保存到新的文件中</p><p><img src="https://pic.imgdb.cn/item/6714fe93d29ded1a8cfdd378.png"></p><p>发现应该是.zip的开头，把37 7A全部替换为50 4B后另存为.zip文件</p><p><img src="https://pic.imgdb.cn/item/6714fef8d29ded1a8cfea62f.png"></p><p>将压缩包中的文件以大小排序后查看第一个发现信息</p><p><img src="https://pic.imgdb.cn/item/6714ff2ed29ded1a8cff445d.png"></p><p><strong>1RVcmVfc</strong></p><h2 id="3-png"><a href="#3-png" class="headerlink" title="3.png"></a>3.png</h2><p>将3.png放入010中</p><p>以模板视图的方式打开文件</p><p><img src="https://pic.imgdb.cn/item/67159e96d29ded1a8c132190.png"></p><p>记录除了最后一个struct的所有crc值 这些crc值对应的ascii码均为可见字符</p><p><strong><code>33 52 6C 5A 33 30 3D</code></strong></p><p>将得到的十六进制转换为ascii码</p><p>转换得到</p><p><strong>3RlZ30&#x3D;</strong></p><h2 id="4-5-png"><a href="#4-5-png" class="headerlink" title="4&#x2F;5.png"></a>4&#x2F;5.png</h2><p>4和5非常简单 拖进010后直接拉到末尾有提示</p><p><img src="https://pic.imgdb.cn/item/6715bd54d29ded1a8c53e441.png"></p><p><strong>cExlX1BsY</strong></p><p><img src="https://pic.imgdb.cn/item/6715bdeed29ded1a8c555f43.png"></p><p><strong>Yzcllfc0lN</strong></p><h2 id="总和"><a href="#总和" class="headerlink" title="总和"></a>总和</h2><p>1.<strong>ZmxhZ3s0X3</strong></p><p>2.<strong>1RVcmVfc</strong></p><p>3.<strong>3RlZ30&#x3D;</strong></p><p>4.<strong>cExlX1BsY</strong></p><p>5.<strong>Yzcllfc0lN</strong></p><p>顺序被打乱了还需要对其进行拼接💔💔💔</p><p>最终的顺序是  1 -&gt; 5 -&gt;4 -&gt; 2 -&gt; 3</p><p><strong>ZmxhZ3s0X3Yzcllfc0lNcExlX1BsY1RVcmVfc3RlZ30&#x3D;</strong></p><p>base64解码</p><p><img src="https://pic.imgdb.cn/item/6715bf7ed29ded1a8c5915fc.png"></p><p><strong>flag{4_v3rY_sIMpLe_PlcTUre_steg}</strong></p>]]></content>
+      
+      
+      <categories>
+          
+          <category> CTF </category>
+          
+          <category> MISC </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> CTF </tag>
+            
+            <tag> MISC </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>AS实现微信基础框架</title>
       <link href="/posts/af3f14ca/"/>
       <url>/posts/af3f14ca/</url>
